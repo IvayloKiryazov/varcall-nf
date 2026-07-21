@@ -110,6 +110,26 @@ def test_compare_vcfs_different(tmp_path: Path) -> None:
     assert "only in B" in result.stdout
 
 
+# --- caller_concordance.py ---------------------------------------------------
+
+def test_caller_concordance(tmp_path: Path) -> None:
+    a = tmp_path / "a.vcf.gz"
+    b = tmp_path / "b.vcf.gz"
+    c = tmp_path / "c.vcf.gz"
+    write_vcf_gz(a, [("chr1", 100, "A", "G"), ("chr1", 200, "C", "T")])
+    write_vcf_gz(b, [("chr1", 100, "A", "G"), ("chr1", 300, "T", "C")])
+    write_vcf_gz(c, [("chr1", 100, "A", "G")])
+    result = run(
+        "caller_concordance.py",
+        "--vcf", f"bcftools={a}",
+        "--vcf", f"freebayes={b}",
+        "--vcf", f"gatk={c}",
+    )
+    assert result.returncode == 0
+    assert "Shared by all: 1" in result.stdout
+    assert "Pairwise Jaccard" in result.stdout
+
+
 # --- pipeline_metrics.py -----------------------------------------------------
 
 def test_pipeline_metrics_report_and_slo(tmp_path: Path) -> None:

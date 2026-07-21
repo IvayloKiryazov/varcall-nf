@@ -6,6 +6,13 @@ broad backlog spanning both engineering hardening and analysis capability. Each 
 
 Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO) analysis/science.
 
+## Milestones
+
+- **0.x (current)** - build breadth; each capability landed and green in CI.
+- **1.0.0** - stability contract: real reads, multi-sample, digest-pinned reproducibility,
+  nf-core-lint clean, stable documented params, first tagged release. Exit criteria and the
+  full checklist live in [RELEASING.md](RELEASING.md).
+
 ---
 
 ## Implemented
@@ -38,7 +45,7 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 - [ ] (BIO) Base-quality score recalibration (BQSR) for the GATK path.
 - [ ] (BIO) VEP as an alternative annotator; compare to SnpEff.
 - [ ] (BIO) DeepVariant as a `--caller`; compare a deep-learning caller to the rest.
-- [ ] (BIO) N-way caller concordance report (extend `compare_vcfs.py`).
+- [x] (BIO) N-way caller concordance report (`bin/caller_concordance.py`).
 - [ ] (BIO) Structural-variant calling (e.g. Manta/Delly) as an optional branch.
 - [ ] (BIO) Coverage-vs-sensitivity mini-experiment (downsampling curve).
 

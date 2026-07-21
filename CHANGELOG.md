@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.0
+
+- N-way caller concordance tool (`bin/caller_concordance.py`) + tests.
+- Versioning policy and explicit path-to-v1.0 criteria (`docs/RELEASING.md`); milestones
+  added to the roadmap.
+
 ## v0.5.0
 
 More callers, coverage, real-data path, annotation, and QA automation.

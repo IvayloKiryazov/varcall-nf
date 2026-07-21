@@ -155,7 +155,8 @@ ruff check bin tests && pytest
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) - the SLO/metrics angle.
 - [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md) - domain references + concept-to-code map.
 - [`docs/EXERCISES.md`](docs/EXERCISES.md) - progressive hands-on exercises.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) - themed backlog of planned enhancements.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) - themed backlog + milestones.
+- [`docs/RELEASING.md`](docs/RELEASING.md) - versioning policy and the path to v1.0.
 - [`AGENTS.md`](AGENTS.md) - guide for AI agents / contributors, plus `.agents/skills/`.
 
 ## License
