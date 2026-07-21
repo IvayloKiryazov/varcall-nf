@@ -156,17 +156,33 @@ def test_validate_samplesheet_missing_column(tmp_path: Path) -> None:
 
 # --- check_qc.py -------------------------------------------------------------
 
-def test_check_qc_pass_and_fail(tmp_path: Path) -> None:
+def test_check_qc_mapped_rate(tmp_path: Path) -> None:
     stats = tmp_path / "s.txt"
     stats.write_text(
         "# comment\n"
         "SN\traw total sequences:\t1000\n"
         "SN\treads mapped:\t980\n"
     )
-    ok = run("check_qc.py", str(stats), "--min-mapped-rate", "0.90")
+    ok = run("check_qc.py", "--stats", str(stats), "--min-mapped-rate", "0.90")
     assert ok.returncode == 0
     assert "PASS" in ok.stdout
 
-    bad = run("check_qc.py", str(stats), "--min-mapped-rate", "0.99")
+    bad = run("check_qc.py", "--stats", str(stats), "--min-mapped-rate", "0.99")
+    assert bad.returncode == 1
+    assert "FAIL" in bad.stdout
+
+
+def test_check_qc_mean_coverage(tmp_path: Path) -> None:
+    summary = tmp_path / "cov.mosdepth.summary.txt"
+    summary.write_text(
+        "chrom\tlength\tbases\tmean\tmin\tmax\n"
+        "testchr\t20000\t800000\t40.00\t0\t68\n"
+        "total\t20000\t800000\t40.00\t0\t68\n"
+    )
+    ok = run("check_qc.py", "--mosdepth-summary", str(summary), "--min-mean-coverage", "20")
+    assert ok.returncode == 0
+    assert "Mean coverage: 40.00" in ok.stdout
+
+    bad = run("check_qc.py", "--mosdepth-summary", str(summary), "--min-mean-coverage", "50")
     assert bad.returncode == 1
     assert "FAIL" in bad.stdout

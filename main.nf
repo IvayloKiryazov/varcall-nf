@@ -9,8 +9,11 @@ include { BWA_MEM         } from './modules/local/bwa_mem.nf'
 include { SAMTOOLS_SORT   } from './modules/local/samtools_sort.nf'
 include { MARKDUP         } from './modules/local/markdup.nf'
 include { SAMTOOLS_STATS  } from './modules/local/samtools_stats.nf'
+include { MOSDEPTH        } from './modules/local/mosdepth.nf'
+include { SAMTOOLS_DICT   } from './modules/local/samtools_dict.nf'
 include { BCFTOOLS_CALL   } from './modules/local/bcftools_call.nf'
 include { FREEBAYES       } from './modules/local/freebayes.nf'
+include { GATK_HAPLOTYPECALLER } from './modules/local/gatk_haplotypecaller.nf'
 include { BCFTOOLS_NORM   } from './modules/local/bcftools_norm.nf'
 include { BCFTOOLS_FILTER } from './modules/local/bcftools_filter.nf'
 include { BCFTOOLS_STATS  } from './modules/local/bcftools_stats.nf'
@@ -58,8 +61,9 @@ workflow {
     }
 
     SAMTOOLS_STATS(ch_bam)
+    MOSDEPTH(ch_bam)
 
-    // Variant calling: pick the caller with --caller (bcftools | freebayes).
+    // Variant calling: pick the caller with --caller (bcftools | freebayes | gatk).
     if (params.caller == 'bcftools') {
         BCFTOOLS_CALL(ch_bam, ch_reference, ch_fai)
         ch_raw_vcf = BCFTOOLS_CALL.out.vcf
@@ -68,8 +72,13 @@ workflow {
         FREEBAYES(ch_bam, ch_reference, ch_fai)
         ch_raw_vcf = FREEBAYES.out.vcf
     }
+    else if (params.caller == 'gatk') {
+        SAMTOOLS_DICT(ch_reference)
+        GATK_HAPLOTYPECALLER(ch_bam, ch_reference, ch_fai, SAMTOOLS_DICT.out.dict.first())
+        ch_raw_vcf = GATK_HAPLOTYPECALLER.out.vcf
+    }
     else {
-        error "Unknown --caller '${params.caller}'. Supported: 'bcftools', 'freebayes'."
+        error "Unknown --caller '${params.caller}'. Supported: 'bcftools', 'freebayes', 'gatk'."
     }
 
     // Normalise then filter to produce the final published VCF.
@@ -79,10 +88,12 @@ workflow {
 
     BCFTOOLS_STATS(ch_vcf)
 
-    // Aggregate QC (FastQC + fastp + samtools stats + bcftools stats) into one MultiQC report.
+    // Aggregate QC (FastQC + fastp + samtools stats + mosdepth + bcftools stats) into MultiQC.
     ch_reports = FASTQC.out.zip.map { it[1] }
         .mix(ch_fastp_qc)
         .mix(SAMTOOLS_STATS.out.stats)
+        .mix(MOSDEPTH.out.summary)
+        .mix(MOSDEPTH.out.dist)
         .mix(BCFTOOLS_STATS.out.stats)
         .collect()
     MULTIQC(ch_reports)
