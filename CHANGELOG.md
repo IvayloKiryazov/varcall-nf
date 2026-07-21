@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.12.0
+
+- Release workflow now generates and attaches an SPDX **SBOM**.
+- Added `SECURITY.md` documenting the security posture (digest pinning, Trivy, SBOM, no secrets).
+
 ## v0.11.0
 
 - Real-reads path: `-profile test_sra` streams a real E. coli run from ENA, downsampled with

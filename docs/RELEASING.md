@@ -28,12 +28,13 @@ from `1.0.0` onward the public interface is stable within a major version.
 - [x] Coverage + data-quality SLO gates; reproducibility (determinism) gate.
 - [x] Golden-VCF snapshot regression; workflow linting; nf-test module tests.
 - [x] On-demand real-reference run (`test_full`) verified in CI.
-- [ ] Real **ENA/SRA reads** on the real-data path (not only simulated).
+- [x] Real **ENA/SRA reads** on the real-data path (verified via `test_sra`).
 - [x] **Multi-sample** support end-to-end with a joint (cross-sample) report.
-- [ ] **Annotation** (SnpEff) verified on the real-data path.
+- [ ] **Annotation** (SnpEff) verified on the real-data path (needs reference/DB contig match).
 - [x] **Container digest pinning** (`@sha256:...`) for bit-for-bit reproducibility.
+- [x] Release automation + **SBOM** attached to each GitHub Release.
 - [ ] **nf-core lint** clean; expanded nf-test coverage (caller + filter modules).
-- [ ] Stable, documented parameter set (no planned breaking changes).
-- [ ] First tagged GitHub Release with signed changelog notes.
+- [ ] Stable, documented parameter set (`nextflow_schema.json`; no planned breaking changes).
+- [ ] First tagged GitHub Release.
 
 When every box is ticked and CI (gating + `test_full`) is green, cut **v1.0.0**.

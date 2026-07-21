@@ -41,7 +41,7 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 
 ## Analysis / science
 
-- [ ] (BIO) Use real ENA/SRA reads (not simulated) on the real-data path.
+- [x] (BIO) Use real ENA/SRA reads (not simulated) on the real-data path (`test_sra`).
 - [ ] (BIO) Base-quality score recalibration (BQSR) for the GATK path.
 - [ ] (BIO) VEP as an alternative annotator; compare to SnpEff.
 - [ ] (BIO) DeepVariant as a `--caller`; compare a deep-learning caller to the rest.
@@ -71,7 +71,7 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 - [x] (ENG) Container image scanning (Trivy), weekly + on-demand.
 - [x] (ENG) Release automation (tag-triggered GitHub Release).
 - [ ] (ENG) Parameter JSON schema (nf-core style) + schema-based validation.
-- [ ] (ENG) SBOM per release (e.g. Syft) attached to the GitHub Release.
+- [x] (ENG) SBOM per release (Syft) attached to the GitHub Release.
 - [ ] (ENG) Zenodo integration for a citable DOI on each release.
 
 ## Deployment / scale
