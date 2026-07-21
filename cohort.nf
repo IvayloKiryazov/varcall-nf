@@ -16,12 +16,13 @@ include { GATK_HAPLOTYPECALLER_GVCF } from './modules/local/gatk_haplotypecaller
 include { GATK_COMBINE_GVCFS       } from './modules/local/gatk_combine_gvcfs.nf'
 include { GATK_GENOTYPE_GVCFS      } from './modules/local/gatk_genotype_gvcfs.nf'
 
-params.input     = "${projectDir}/assets/samplesheet_cohort.csv"
-params.reference = "${projectDir}/assets/cohort_test_data/reference/ref.fa"
-params.outdir    = 'results_cohort'
+// Own param names (not `input`/`reference`) so nextflow.config defaults don't override them.
+params.cohort_input     = "${projectDir}/assets/samplesheet_cohort.csv"
+params.cohort_reference = "${projectDir}/assets/cohort_test_data/reference/ref.fa"
+params.outdir           = 'results_cohort'
 
 workflow {
-    ch_reference = Channel.value(file(params.reference, checkIfExists: true))
+    ch_reference = Channel.value(file(params.cohort_reference, checkIfExists: true))
 
     BWA_INDEX(ch_reference)
     SAMTOOLS_FAIDX(ch_reference)
@@ -31,7 +32,7 @@ workflow {
     ch_dict  = SAMTOOLS_DICT.out.dict.first()
 
     ch_reads = Channel
-        .fromPath(params.input, checkIfExists: true)
+        .fromPath(params.cohort_input, checkIfExists: true)
         .splitCsv(header: true)
         .map { row -> tuple(row.sample, [file(row.fastq_1, checkIfExists: true),
                                          file(row.fastq_2, checkIfExists: true)]) }
