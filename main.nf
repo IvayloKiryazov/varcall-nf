@@ -37,9 +37,3 @@ workflow {
         .collect()
     MULTIQC(ch_reports)
 }
-
-workflow.onComplete {
-    log.info(workflow.success
-        ? "Pipeline finished. Results in: ${params.outdir}"
-        : "Pipeline failed. See the log above.")
-}
