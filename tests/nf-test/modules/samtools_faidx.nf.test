@@ -17,7 +17,7 @@ nextflow_process {
         then {
             assert process.success
             assert path(process.out.fai.get(0)).exists()
-            assert path(process.out.fai.get(0)).getName().endsWith(".fai")
+            assert process.out.fai.get(0).endsWith(".fai")
         }
     }
 }
