@@ -67,10 +67,11 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 - [ ] (ENG) Cross-run metric trending to detect performance drift.
 - [ ] (ENG) `-resume`/caching demonstration and documentation.
 - [ ] (ENG) Auto-generated architecture docs from the Nextflow DAG.
-- [ ] (ENG) `pre-commit` CI job (run the configured hooks in CI).
+- [x] (ENG) `pre-commit` CI job (run the configured hooks in CI).
+- [x] (ENG) Container image scanning (Trivy), weekly + on-demand.
+- [x] (ENG) Release automation (tag-triggered GitHub Release).
 - [ ] (ENG) Parameter JSON schema (nf-core style) + schema-based validation.
-- [ ] (ENG) Container image scanning (Trivy) and an SBOM per release.
-- [ ] (ENG) Release automation (release-please / tag-triggered GitHub Release).
+- [ ] (ENG) SBOM per release (e.g. Syft) attached to the GitHub Release.
 - [ ] (ENG) Zenodo integration for a citable DOI on each release.
 
 ## Deployment / scale

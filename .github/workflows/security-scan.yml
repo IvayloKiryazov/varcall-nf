@@ -1,0 +1,29 @@
+name: Security scan (Trivy)
+
+# Scans the pinned container images for known vulnerabilities. On-demand + weekly, so it
+# never blocks day-to-day development but keeps an eye on the dependency surface.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0
+          - quay.io/biocontainers/bwa:0.7.17--he4a0461_11
+          - quay.io/biocontainers/samtools:1.17--h00cdaf9_0
+          - quay.io/biocontainers/bcftools:1.17--haef29d1_0
+          - quay.io/biocontainers/gatk4:4.5.0.0--py36hdfd78af_0
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ matrix.image }}
+          format: table
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL

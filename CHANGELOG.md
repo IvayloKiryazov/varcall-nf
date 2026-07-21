@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.10.0
+
+- CI: `pre-commit` hooks run as a CI job.
+- CI: tag-triggered GitHub **Release** workflow (`release.yml`).
+- CI: weekly + on-demand **Trivy** container vulnerability scan (`security-scan.yml`).
+
 ## v0.9.0
 
 - Reproducibility: every container image is now pinned by `@sha256` digest.
