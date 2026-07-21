@@ -1,0 +1,33 @@
+name: test_full (real data, on-demand)
+
+# Heavy integration run against a real reference (E. coli K-12). Not part of the gating CI;
+# trigger manually from the Actions tab. Mirrors the fast/gating vs. expensive/integration
+# split used in production CI.
+on:
+  workflow_dispatch:
+
+env:
+  NXF_VER: '24.10.5'
+
+jobs:
+  run:
+    name: Run pipeline on real reference
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Nextflow
+        run: |
+          curl -s https://get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Run pipeline (test_full)
+        run: nextflow run . -profile docker,test_full --outdir results_full
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results_full
+          path: results_full

@@ -32,6 +32,29 @@ def write_vcf_gz(path: Path, records: list[tuple[str, int, str, str]]) -> None:
 
 # --- generate_test_data.py ---------------------------------------------------
 
+def test_simulate_reads_from_reference(tmp_path: Path) -> None:
+    ref = REPO_ROOT / "assets" / "test_data" / "reference" / "ref.fa"
+    out1, out2 = tmp_path / "a", tmp_path / "b"
+    for out in (out1, out2):
+        out.mkdir()
+        result = run(
+            "simulate_reads_from_reference.py",
+            "--reference", str(ref),
+            "--outdir", str(out),
+            "--region-length", "20000",
+            "--num-snps", "5",
+        )
+        assert result.returncode == 0, result.stderr
+    truth = (out1 / "sim.truth.tsv").read_text().splitlines()
+    assert len(truth) == 1 + 5
+    assert (out1 / "sim.sim_1.fastq.gz").stat().st_size > 0
+    assert (out1 / "sim.sim_2.fastq.gz").stat().st_size > 0
+    # deterministic (compare decompressed content; gzip headers embed an mtime)
+    with gzip.open(out1 / "sim.sim_1.fastq.gz") as a, gzip.open(out2 / "sim.sim_1.fastq.gz") as b:
+        assert a.read() == b.read()
+    assert (out1 / "sim.truth.tsv").read_text() == (out2 / "sim.truth.tsv").read_text()
+
+
 def test_generate_test_data_is_deterministic(tmp_path: Path) -> None:
     out1, out2 = tmp_path / "a", tmp_path / "b"
     for out in (out1, out2):

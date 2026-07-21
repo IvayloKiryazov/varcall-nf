@@ -23,15 +23,20 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 - [x] (BIO) Duplicate marking (samtools markdup).
 - [x] (BIO) Variant normalisation + soft filtering (bcftools norm / filter).
 - [x] (BIO) Selectable variant caller (`--caller` bcftools | freebayes) with a caller matrix in CI.
-- [x] (BIO) Aggregated QC reporting (FastQC + fastp + samtools stats + bcftools stats -> MultiQC).
+- [x] (BIO) Aggregated QC reporting (FastQC + fastp + samtools stats + mosdepth + bcftools stats -> MultiQC).
+- [x] (BIO) GATK HaplotypeCaller as a third `--caller` (with samtools dict).
+- [x] (BIO) Coverage reporting (mosdepth) + mean-coverage data-quality gate.
+- [x] (BIO) Run on a real reference (*E. coli* K-12) via `-profile test_full` (simulated reads).
+- [x] (BIO) Variant annotation via SnpEff (`--annotate`, on the real-data path).
+- [x] (ENG) Golden-VCF snapshot regression test in CI.
+- [x] (ENG) Workflow linting (actionlint) in CI.
+- [x] (ENG) On-demand integration workflow (`test_full.yml`) separate from gating CI.
 
 ## Analysis / science
 
-- [ ] (BIO) Run on real public data (e.g. *E. coli* K-12 reference + an ENA/SRA run).
-- [ ] (BIO) Add a remote `test_full` profile using an `nf-core/test-datasets`-style dataset.
+- [ ] (BIO) Use real ENA/SRA reads (not simulated) on the real-data path.
 - [ ] (BIO) Base-quality score recalibration (BQSR) for the GATK path.
-- [ ] (BIO) Variant annotation (SnpEff or VEP) - report gene/effect per variant.
-- [ ] (BIO) GATK HaplotypeCaller as a third `--caller`.
+- [ ] (BIO) VEP as an alternative annotator; compare to SnpEff.
 - [ ] (BIO) DeepVariant as a `--caller`; compare a deep-learning caller to the rest.
 - [ ] (BIO) N-way caller concordance report (extend `compare_vcfs.py`).
 - [ ] (BIO) Structural-variant calling (e.g. Manta/Delly) as an optional branch.

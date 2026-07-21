@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
+include { PREPARE_REFERENCE } from './modules/local/prepare_reference.nf'
+include { SIMULATE_READS    } from './modules/local/simulate_reads.nf'
 include { FASTQC          } from './modules/local/fastqc.nf'
 include { TRIM_FASTP      } from './modules/local/trim_fastp.nf'
 include { BWA_INDEX       } from './modules/local/bwa_index.nf'
@@ -17,19 +19,27 @@ include { GATK_HAPLOTYPECALLER } from './modules/local/gatk_haplotypecaller.nf'
 include { BCFTOOLS_NORM   } from './modules/local/bcftools_norm.nf'
 include { BCFTOOLS_FILTER } from './modules/local/bcftools_filter.nf'
 include { BCFTOOLS_STATS  } from './modules/local/bcftools_stats.nf'
+include { SNPEFF          } from './modules/local/snpeff.nf'
 include { MULTIQC         } from './modules/local/multiqc.nf'
 
 workflow {
 
-    // Parse the samplesheet into (sample, [fastq_1, fastq_2]) tuples.
-    ch_reads = Channel
-        .fromPath(params.input, checkIfExists: true)
-        .splitCsv(header: true)
-        .map { row -> tuple(row.sample, [file(row.fastq_1, checkIfExists: true),
-                                         file(row.fastq_2, checkIfExists: true)]) }
-
-    // The reference is reused by several processes, so make derived indices value channels.
-    ch_reference = Channel.value(file(params.reference, checkIfExists: true))
+    // Reads + reference: either simulate from a (possibly remote/gzipped) reference
+    // (--simulate_reads, used by -profile test_full), or read a local samplesheet.
+    if (params.simulate_reads) {
+        PREPARE_REFERENCE(Channel.value(file(params.reference, checkIfExists: true)))
+        ch_reference = PREPARE_REFERENCE.out.fasta.first()
+        SIMULATE_READS(ch_reference.map { ref -> tuple(params.sample_id, ref) })
+        ch_reads = SIMULATE_READS.out.reads
+    }
+    else {
+        ch_reads = Channel
+            .fromPath(params.input, checkIfExists: true)
+            .splitCsv(header: true)
+            .map { row -> tuple(row.sample, [file(row.fastq_1, checkIfExists: true),
+                                             file(row.fastq_2, checkIfExists: true)]) }
+        ch_reference = Channel.value(file(params.reference, checkIfExists: true))
+    }
 
     FASTQC(ch_reads)
     BWA_INDEX(ch_reference)
@@ -87,6 +97,11 @@ workflow {
     ch_vcf = BCFTOOLS_FILTER.out.vcf
 
     BCFTOOLS_STATS(ch_vcf)
+
+    // Optional functional annotation (needs a matching snpeff_db; used on real-data runs).
+    if (params.annotate) {
+        SNPEFF(ch_vcf)
+    }
 
     // Aggregate QC (FastQC + fastp + samtools stats + mosdepth + bcftools stats) into MultiQC.
     ch_reports = FASTQC.out.zip.map { it[1] }

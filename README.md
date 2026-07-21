@@ -97,11 +97,26 @@ results/
 |---|---|---|
 | `--input` | `assets/samplesheet.csv` | CSV: `sample,fastq_1,fastq_2` |
 | `--reference` | bundled 20 kb test genome | Reference FASTA |
-| `--caller` | `bcftools` | Variant caller: `bcftools` or `freebayes` |
+| `--caller` | `bcftools` | Variant caller: `bcftools`, `freebayes`, or `gatk` |
 | `--trim` | `true` | Adapter/quality trimming with fastp |
 | `--mark_duplicates` | `true` | Mark PCR/optical duplicates |
 | `--filter_expr` | `QUAL<20 \|\| INFO/DP<10` | bcftools soft-filter expression |
+| `--annotate` | `false` | Functional annotation with SnpEff (needs `--snpeff_db`) |
+| `--simulate_reads` | `false` | Simulate reads from `--reference` (see `-profile test_full`) |
 | `--outdir` | `results` | Output directory |
+
+### Real-data run (on-demand)
+
+`-profile test_full` downloads the *E. coli* K-12 reference and simulates reads from it, so the
+pipeline can be exercised on a real genome without hosting large read files:
+
+```bash
+nextflow run . -profile docker,test_full --outdir results_full
+```
+
+This is wired as a manually-triggered GitHub Actions workflow
+(`.github/workflows/test_full.yml`), mirroring the split between fast gating CI and expensive
+integration runs.
 
 Run on your own data:
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.5.0
+
+More callers, coverage, real-data path, annotation, and QA automation.
+
+- GATK HaplotypeCaller as `--caller gatk` (via samtools dict); added to the CI caller matrix.
+- Coverage reporting with mosdepth -> MultiQC, plus a mean-coverage data-quality gate
+  (`bin/check_qc.py` now handles samtools stats and/or mosdepth).
+- On-demand real-data path: `-profile test_full` downloads the E. coli K-12 reference and
+  simulates reads from it (`bin/simulate_reads_from_reference.py`, `PREPARE_REFERENCE`,
+  `SIMULATE_READS`); manual `test_full.yml` workflow.
+- Optional SnpEff annotation (`--annotate`).
+- QA automation: golden-VCF snapshot regression test and actionlint workflow linting in CI.
+
 ## v0.4.0
 
 Agentic-friendly tooling, expanded learning material, and Nextflow module tests.
