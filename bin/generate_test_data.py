@@ -54,6 +54,8 @@ def main() -> None:
     parser.add_argument("--num-snps", default=10, type=int)
     parser.add_argument("--seed", default=42, type=int, help="Seed for this sample's SNPs/reads.")
     parser.add_argument("--ref-seed", default=1, type=int, help="Seed for the shared reference.")
+    parser.add_argument("--pos-shift", default=0, type=int,
+                        help="Shift SNP positions by this many bp (to create private variants).")
     args = parser.parse_args()
 
     # Reference is deterministic from --ref-seed, so every sample shares the same reference.
@@ -65,7 +67,7 @@ def main() -> None:
     spacing = (args.ref_length - 2 * margin) // (args.num_snps + 1)
     truth = []
     for i in range(1, args.num_snps + 1):
-        pos = margin + i * spacing
+        pos = margin + i * spacing + args.pos_shift
         ref_base = reference[pos]
         alt_base = rng.choice([b for b in BASES if b != ref_base])
         sample[pos] = alt_base

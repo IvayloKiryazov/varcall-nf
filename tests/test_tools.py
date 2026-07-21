@@ -197,6 +197,43 @@ def test_caller_concordance(tmp_path: Path) -> None:
     assert "Pairwise Jaccard" in result.stdout
 
 
+# --- check_cohort.py ---------------------------------------------------------
+
+def test_check_cohort(tmp_path: Path) -> None:
+    truth_a = tmp_path / "a.tsv"
+    truth_a.write_text("contig\tposition\tref\talt\ntestchr\t100\tA\tT\n")
+    truth_b = tmp_path / "b.tsv"
+    truth_b.write_text("contig\tposition\tref\talt\ntestchr\t200\tG\tC\n")
+
+    vcf = tmp_path / "cohort.vcf.gz"
+    with gzip.open(vcf, "wt") as fh:
+        fh.write("##fileformat=VCFv4.2\n")
+        fh.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsA\tsB\n")
+        # sA private at 100 (sA alt, sB ref); sB private at 200 (sA ref, sB alt)
+        fh.write("testchr\t100\t.\tA\tT\t100\t.\t.\tGT\t1/1\t0/0\n")
+        fh.write("testchr\t200\t.\tG\tC\t100\t.\t.\tGT\t0/0\t1/1\n")
+
+    ok = run(
+        "check_cohort.py", "--vcf", str(vcf),
+        "--truth", f"sA={truth_a}", "--truth", f"sB={truth_b}",
+    )
+    assert ok.returncode == 0, ok.stdout
+    assert "PASS" in ok.stdout
+
+    # Break it: sB is alt where it should be 0/0
+    bad = tmp_path / "bad.vcf.gz"
+    with gzip.open(bad, "wt") as fh:
+        fh.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsA\tsB\n")
+        fh.write("testchr\t100\t.\tA\tT\t100\t.\t.\tGT\t1/1\t1/1\n")
+        fh.write("testchr\t200\t.\tG\tC\t100\t.\t.\tGT\t0/0\t1/1\n")
+    fail = run(
+        "check_cohort.py", "--vcf", str(bad),
+        "--truth", f"sA={truth_a}", "--truth", f"sB={truth_b}",
+    )
+    assert fail.returncode == 1
+    assert "FAIL" in fail.stdout
+
+
 # --- pipeline_metrics.py -----------------------------------------------------
 
 def test_pipeline_metrics_report_and_slo(tmp_path: Path) -> None:

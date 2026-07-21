@@ -42,6 +42,8 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 ## Analysis / science
 
 - [x] (BIO) Use real ENA/SRA reads (not simulated) on the real-data path (`test_sra`).
+- [x] (BIO) Joint (cohort) genotyping: GATK GVCF -> CombineGVCFs -> GenotypeGVCFs (`cohort.nf`).
+- [ ] (BIO) Scale cohort with GenomicsDBImport + VQSR (variant quality recalibration).
 - [ ] (BIO) Base-quality score recalibration (BQSR) for the GATK path.
 - [ ] (BIO) VEP as an alternative annotator; compare to SnpEff.
 - [ ] (BIO) DeepVariant as a `--caller`; compare a deep-learning caller to the rest.

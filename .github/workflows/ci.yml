@@ -125,6 +125,34 @@ jobs:
           name: results_rna
           path: results_rna
 
+  cohort:
+    name: Joint genotyping (GATK cohort)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Nextflow
+        run: |
+          curl -s https://get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Run cohort joint genotyping
+        run: nextflow run cohort.nf -profile docker --outdir results_cohort
+      - name: Assert per-sample genotypes
+        run: |
+          python3 bin/check_cohort.py \
+            --vcf results_cohort/cohort/cohort.vcf.gz \
+            --truth cohortA=assets/cohort_test_data/truth_cohortA.tsv \
+            --truth cohortB=assets/cohort_test_data/truth_cohortB.tsv
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results_cohort
+          path: results_cohort
+
   reproducibility:
     name: Reproducibility (determinism check)
     runs-on: ubuntu-latest

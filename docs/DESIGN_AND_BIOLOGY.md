@@ -94,6 +94,20 @@ strain typing, evolution, etc.
 allele, a quality score, filter status, site-level `INFO` (e.g. `DP` depth), and per-sample
 `FORMAT` (e.g. `GT` genotype: `0/1` heterozygous, `1/1` homozygous-alt).
 
+### Joint (cohort) genotyping - the industry-standard multi-sample workflow
+Calling each sample independently and merging VCFs is weak: if sample B has no variant at a
+site, an independent call simply omits it, so you can't tell "reference" from "not sequenced".
+The **GATK Best-Practices** cohort workflow fixes this:
+1. **HaplotypeCaller in GVCF mode** (`-ERC GVCF`) per sample - emits a record for *every*
+   position (variant or not) with the evidence for the reference allele.
+2. **CombineGVCFs** merges the per-sample GVCFs.
+3. **GenotypeGVCFs** jointly genotypes all samples at all sites.
+The payoff: at a variant private to sample A, sample B gets a confident `0/0` (reference) call
+backed by its own read evidence, rather than a missing entry. This project demonstrates it in
+`cohort.nf` and asserts the per-sample genotypes with `bin/check_cohort.py` (owner alt, others
+`0/0`). Real cohorts scale this with GenomicsDBImport and add variant-quality recalibration
+(VQSR) - natural next steps.
+
 ---
 
 ## Part 2 - RNA-seq quantification

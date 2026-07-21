@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.0
+
+- Industry-standard **joint (cohort) genotyping** (`cohort.nf`): GATK HaplotypeCaller GVCF ->
+  CombineGVCFs -> GenotypeGVCFs, with a dedicated cohort dataset containing private variants and
+  a per-sample genotype correctness gate (`bin/check_cohort.py`), run as its own CI job.
+- `generate_test_data.py` gains `--pos-shift` (to create private variants across samples).
+- Biology doc extended with the joint-genotyping rationale.
+
 ## v1.1.0
 
 - Second assay: **RNA-seq** transcript quantification with Salmon (`rnaseq.nf`), a

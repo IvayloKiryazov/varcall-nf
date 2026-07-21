@@ -126,6 +126,15 @@ For **real sequencing reads**, `-profile test_sra` streams a real *E. coli* run 
 nextflow run . -profile docker,test_sra --outdir results_sra
 ```
 
+### Joint (cohort) genotyping
+
+The GATK Best-Practices multi-sample workflow (per-sample GVCFs -> CombineGVCFs ->
+GenotypeGVCFs), which genotypes every sample at every cohort site:
+
+```bash
+nextflow run cohort.nf -profile docker --outdir results_cohort
+```
+
 ### RNA-seq (second assay)
 
 A separate entry point quantifies transcript expression with Salmon (pseudo-alignment) and

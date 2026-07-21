@@ -1,0 +1,3 @@
+sample,fastq_1,fastq_2
+cohortA,assets/cohort_test_data/reads/cohortA_R1.fastq.gz,assets/cohort_test_data/reads/cohortA_R2.fastq.gz
+cohortB,assets/cohort_test_data/reads/cohortB_R1.fastq.gz,assets/cohort_test_data/reads/cohortB_R2.fastq.gz
