@@ -63,7 +63,7 @@ def test_generate_test_data_is_deterministic(tmp_path: Path) -> None:
     ref1 = (out1 / "reference" / "ref.fa").read_bytes()
     ref2 = (out2 / "reference" / "ref.fa").read_bytes()
     assert ref1 == ref2
-    truth = (out1 / "truth_snps.tsv").read_text().splitlines()
+    truth = (out1 / "truth_sample1.tsv").read_text().splitlines()
     assert len(truth) == 1 + 5  # header + 5 SNPs
 
 

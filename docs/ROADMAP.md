@@ -59,7 +59,7 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 ## Engineering / reliability
 
 - [ ] (ENG) nf-test module + pipeline tests wired into CI (scaffold in `tests/nf-test/`).
-- [ ] (ENG) Multi-sample end-to-end support with a joint cross-sample report.
+- [x] (ENG) Multi-sample end-to-end support (bundled 2-sample dataset; MultiQC joint report).
 - [ ] (ENG) `conda` profile as an alternative to containers.
 - [ ] (ENG) Container digest pinning (`@sha256:...`) for bit-for-bit reproducibility.
 - [ ] (ENG) Data-quality SLOs beyond mapped-rate (mean coverage, duplicate rate).

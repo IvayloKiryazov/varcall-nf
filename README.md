@@ -127,9 +127,11 @@ nextflow run . -profile docker \
 
 ## The test dataset
 
-`bin/generate_test_data.py` deterministically builds a 20 kb reference, mutates a copy with 10
-known SNPs, and simulates ~40x paired-end reads from the mutated copy. Aligning back to the
-*unmutated* reference should recover exactly those 10 SNPs - which is what CI asserts.
+`bin/generate_test_data.py` deterministically builds a 20 kb reference (shared via
+`--ref-seed`) and, per sample, mutates a copy with 10 known SNPs and simulates ~40x paired-end
+reads from it. The bundled dataset has **two samples** (`sample1`, `sample2`) sharing one
+reference. Aligning back to the *unmutated* reference should recover exactly each sample's
+SNPs - which is what CI asserts for every sample.
 
 ## Tests & CI
 

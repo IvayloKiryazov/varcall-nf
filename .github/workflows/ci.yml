@@ -49,17 +49,21 @@ jobs:
           nextflow -version
       - name: Run pipeline (${{ matrix.caller }})
         run: nextflow run . -profile docker,test --caller ${{ matrix.caller }} --outdir results
-      - name: Assert known SNPs were recovered
+      - name: Assert known SNPs were recovered (all samples)
         run: |
-          python3 bin/check_variants.py \
-            --vcf results/variants/sample1.vcf.gz \
-            --truth assets/test_data/truth_snps.tsv
+          for s in sample1 sample2; do
+            python3 bin/check_variants.py \
+              --vcf results/variants/$s.vcf.gz \
+              --truth assets/test_data/truth_$s.tsv
+          done
       - name: Data-quality gate (alignment + coverage)
         run: |
-          python3 bin/check_qc.py \
-            --stats results/stats/sample1.samtools_stats.txt \
-            --mosdepth-summary results/coverage/sample1.mosdepth.summary.txt \
-            --min-mapped-rate 0.90 --min-mean-coverage 20
+          for s in sample1 sample2; do
+            python3 bin/check_qc.py \
+              --stats results/stats/$s.samtools_stats.txt \
+              --mosdepth-summary results/coverage/$s.mosdepth.summary.txt \
+              --min-mapped-rate 0.90 --min-mean-coverage 20
+          done
       - name: Snapshot regression (golden VCF)
         if: matrix.caller == 'bcftools'
         run: |

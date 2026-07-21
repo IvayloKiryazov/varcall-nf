@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.0
+
+- Multi-sample support: the bundled dataset now has two samples (`sample1`, `sample2`) sharing
+  one reference; CI asserts correctness and data-quality for every sample; MultiQC produces a
+  joint report. `generate_test_data.py` gains `--sample`/`--ref-seed` (per-sample truth files).
+
 ## v0.6.0
 
 - N-way caller concordance tool (`bin/caller_concordance.py`) + tests.

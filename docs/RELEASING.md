@@ -29,7 +29,7 @@ from `1.0.0` onward the public interface is stable within a major version.
 - [x] Golden-VCF snapshot regression; workflow linting; nf-test module tests.
 - [x] On-demand real-reference run (`test_full`) verified in CI.
 - [ ] Real **ENA/SRA reads** on the real-data path (not only simulated).
-- [ ] **Multi-sample** support end-to-end with a joint (cross-sample) report.
+- [x] **Multi-sample** support end-to-end with a joint (cross-sample) report.
 - [ ] **Annotation** (SnpEff) verified on the real-data path.
 - [ ] **Container digest pinning** (`@sha256:...`) for bit-for-bit reproducibility.
 - [ ] **nf-core lint** clean; expanded nf-test coverage (caller + filter modules).

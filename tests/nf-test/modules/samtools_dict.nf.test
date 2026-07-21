@@ -1,0 +1,23 @@
+nextflow_process {
+
+    name "SAMTOOLS_DICT"
+    script "modules/local/samtools_dict.nf"
+    process "SAMTOOLS_DICT"
+
+    test("creates a sequence dictionary for the reference") {
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/assets/test_data/reference/ref.fa")
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.dict.get(0)).exists()
+            assert process.out.dict.get(0).endsWith(".dict")
+        }
+    }
+}
