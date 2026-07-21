@@ -1,0 +1,32 @@
+name: test_sra (real reads, on-demand)
+
+# Heavy integration run against real sequencing reads streamed from ENA (downsampled) plus the
+# E. coli K-12 reference. Not part of gating CI; trigger manually from the Actions tab.
+on:
+  workflow_dispatch:
+
+env:
+  NXF_VER: '24.10.5'
+
+jobs:
+  run:
+    name: Run pipeline on real ENA reads
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Nextflow
+        run: |
+          curl -s https://get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Run pipeline (test_sra)
+        run: nextflow run . -profile docker,test_sra --outdir results_sra
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results_sra
+          path: results_sra

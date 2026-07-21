@@ -118,6 +118,13 @@ This is wired as a manually-triggered GitHub Actions workflow
 (`.github/workflows/test_full.yml`), mirroring the split between fast gating CI and expensive
 integration runs.
 
+For **real sequencing reads**, `-profile test_sra` streams a real *E. coli* run from ENA
+(downsampled via `--subsample`) against the K-12 reference (`test_sra.yml`):
+
+```bash
+nextflow run . -profile docker,test_sra --outdir results_sra
+```
+
 Run on your own data:
 
 ```bash

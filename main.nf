@@ -3,6 +3,7 @@ nextflow.enable.dsl = 2
 
 include { PREPARE_REFERENCE } from './modules/local/prepare_reference.nf'
 include { SIMULATE_READS    } from './modules/local/simulate_reads.nf'
+include { SUBSAMPLE_READS   } from './modules/local/subsample_reads.nf'
 include { FASTQC          } from './modules/local/fastqc.nf'
 include { TRIM_FASTP      } from './modules/local/trim_fastp.nf'
 include { BWA_INDEX       } from './modules/local/bwa_index.nf'
@@ -46,6 +47,12 @@ workflow {
             .splitCsv(header: true)
             .map { row -> tuple(row.sample, [file(row.fastq_1, checkIfExists: true),
                                              file(row.fastq_2, checkIfExists: true)]) }
+    }
+
+    // Optional downsampling (e.g. to keep real-data runs fast); 0 disables it.
+    if (params.subsample > 0) {
+        SUBSAMPLE_READS(ch_reads, params.subsample)
+        ch_reads = SUBSAMPLE_READS.out.reads
     }
 
     FASTQC(ch_reads)

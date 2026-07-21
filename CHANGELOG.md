@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.11.0
+
+- Real-reads path: `-profile test_sra` streams a real E. coli run from ENA, downsampled with
+  a new `SUBSAMPLE_READS` (seqtk) step (`--subsample N`); on-demand `test_sra.yml` workflow.
+
 ## v0.10.0
 
 - CI: `pre-commit` hooks run as a CI job.
