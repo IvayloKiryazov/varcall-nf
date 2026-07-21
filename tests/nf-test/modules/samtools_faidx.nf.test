@@ -1,0 +1,23 @@
+nextflow_process {
+
+    name "SAMTOOLS_FAIDX"
+    script "modules/local/samtools_faidx.nf"
+    process "SAMTOOLS_FAIDX"
+
+    test("indexes the reference FASTA") {
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/assets/test_data/reference/ref.fa")
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.fai.get(0)).exists()
+            assert path(process.out.fai.get(0)).getName().endsWith(".fai")
+        }
+    }
+}

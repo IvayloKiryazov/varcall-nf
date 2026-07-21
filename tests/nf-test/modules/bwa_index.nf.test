@@ -1,0 +1,23 @@
+nextflow_process {
+
+    name "BWA_INDEX"
+    script "modules/local/bwa_index.nf"
+    process "BWA_INDEX"
+
+    test("builds BWA index files for the reference") {
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/assets/test_data/reference/ref.fa")
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            // bwa index emits .amb .ann .bwt .pac .sa
+            assert process.out.index.get(0).size() >= 5
+        }
+    }
+}

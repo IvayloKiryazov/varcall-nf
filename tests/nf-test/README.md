@@ -1,20 +1,27 @@
-# nf-test scaffold (planned - not yet wired into CI)
+# nf-test module tests
 
-[nf-test](https://www.nf-test.com/) is the standard unit/integration testing framework for
-Nextflow pipelines (used by nf-core). This directory is a placeholder for that roadmap item.
+[nf-test](https://www.nf-test.com/) tests for the Nextflow processes, complementing the pytest
+suite that covers the Python tools in `bin/`.
 
-## Motivation
+## Run locally
 
-The Python tools in `bin/` are unit-tested with pytest, but the **Nextflow processes**
-themselves are not yet. nf-test allows per-module assertions (e.g. "given this BAM, the caller
-emits a VCF with N variants") without running the whole pipeline.
+```bash
+# needs Nextflow (Java 17+), Docker, and nf-test
+curl -fsSL https://get.nf-test.com | bash && sudo mv nf-test /usr/local/bin/
+nf-test test --profile docker
+```
 
-## Getting started
+## Layout
 
-1. Install nf-test: `curl -fsSL https://get.nf-test.com | bash`
-2. Initialise: `nf-test init`
-3. Generate a test for a module, e.g. `nf-test generate process modules/local/bcftools_stats.nf`
-4. Add assertions (see nf-core modules for examples) and run `nf-test test`.
-5. Add an `nf-test` job to `.github/workflows/ci.yml`.
+- `modules/*.nf.test` - per-process tests (currently `SAMTOOLS_FAIDX`, `BWA_INDEX`).
+- Configuration lives in `../../nf-test.config`.
 
-Test files use the `*.nf.test` suffix.
+## Extend
+
+Generate a starting point for another module and add assertions:
+
+```bash
+nf-test generate process modules/local/bcftools_stats.nf
+```
+
+See `.agents/skills/add-pipeline-module/SKILL.md` for the full workflow.

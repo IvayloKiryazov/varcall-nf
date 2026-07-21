@@ -96,3 +96,24 @@ jobs:
             run1/variants/sample1.vcf.gz \
             run2/variants/sample1.vcf.gz \
             --label-a run1 --label-b run2 --require-identical
+
+  nf-test:
+    name: nf-test (Nextflow modules)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Nextflow
+        run: |
+          curl -s https://get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Install nf-test
+        run: |
+          curl -fsSL https://get.nf-test.com | bash
+          sudo mv nf-test /usr/local/bin/
+          nf-test version
+      - name: Run nf-test
+        run: nf-test test --profile docker

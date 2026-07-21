@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0
+
+Agentic-friendly tooling, expanded learning material, and Nextflow module tests.
+
+- `AGENTS.md` guide + `.agents/skills/` (add-pipeline-module, add-variant-caller).
+- nf-test module tests (`SAMTOOLS_FAIDX`, `BWA_INDEX`) + a dedicated CI job.
+- Greatly expanded `docs/GLOSSARY.md` (alleles/genotypes, alignment internals, file formats,
+  processing concepts, RNA-seq, structural variation, ecosystem).
+- New `docs/EXERCISES.md` - progressive, hands-on study exercises.
+
 ## v0.3.0
 
 Expanded analysis steps, more engineering gates, and public-facing documentation.

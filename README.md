@@ -138,8 +138,10 @@ ruff check bin tests && pytest
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) - plain-language definitions of every term.
 - [`docs/PIPELINE.md`](docs/PIPELINE.md) - step-by-step design & decisions.
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) - the SLO/metrics angle.
-- [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md) - courses mapped to repo tasks.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) - the big tiered backlog to learn from.
+- [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md) - domain references + concept-to-code map.
+- [`docs/EXERCISES.md`](docs/EXERCISES.md) - progressive hands-on exercises.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) - themed backlog of planned enhancements.
+- [`AGENTS.md`](AGENTS.md) - guide for AI agents / contributors, plus `.agents/skills/`.
 
 ## License
 

@@ -52,3 +52,69 @@ software background. Definitions are intentionally informal - approachable over 
   `bin/pipeline_metrics.py` and [OBSERVABILITY.md](OBSERVABILITY.md).
 - **Workflow manager (Nextflow)** - orchestrates the steps, handles parallelism, staging
   files between steps, containers, and resuming.
+
+### Alleles, genotypes & ploidy
+- **Allele** - one version of the sequence at a position (e.g. the `A` allele vs the `G`
+  allele).
+- **Reference vs alternate (REF/ALT)** - the allele in the reference vs the differing allele
+  found in the sample.
+- **Homozygous / heterozygous** - both chromosome copies carry the same allele (homo) vs two
+  different alleles (het).
+- **Ploidy** - how many copies of each chromosome an organism has (humans are diploid = 2).
+- **Ts/Tv ratio** - transitions vs transversions; a quick sanity metric for a SNP call set.
+
+### Alignment internals
+- **CIGAR** - a compact string in SAM describing how a read aligns (matches, insertions,
+  deletions, clips).
+- **MAPQ** - mapping quality: how confident the aligner is about where a read went.
+- **Insert size** - the length of the original DNA fragment between paired reads.
+- **Pileup / mpileup** - stacking all reads over each position to see what bases they support;
+  the basis of pileup-based calling.
+- **PCR / optical duplicates** - artificial copies of the same fragment; marked so they don't
+  falsely boost confidence in a variant.
+
+### File formats & indexing
+- **bgzip** - block-gzip compression that allows random access (used for `.vcf.gz`).
+- **tabix / .tbi / .csi** - position indexes for bgzipped files so tools can seek quickly.
+- **BED** - a simple format listing genomic regions (chrom, start, end); used to target
+  analysis to specific intervals.
+- **GFF / GTF** - annotation formats describing features (genes, exons) on a genome.
+- **INFO / FORMAT (VCF)** - VCF columns: `INFO` holds site-level fields (e.g. depth `DP`);
+  `FORMAT` holds per-sample fields (e.g. genotype `GT`).
+- **Reference build / contig** - a specific version of a genome assembly; a `contig` is one
+  named sequence within it (e.g. a chromosome).
+
+### Processing concepts
+- **Adapter trimming** - removing leftover sequencing-adapter bases from reads (fastp here).
+- **Normalisation / left-alignment** - representing indels in a canonical position so callers
+  can be compared (`bcftools norm`).
+- **Filtering** - flagging/removing low-confidence calls by quality/depth (`bcftools filter`).
+- **BQSR (base quality score recalibration)** - correcting systematic errors in per-base
+  quality scores; a GATK best-practice step (roadmap).
+- **Joint genotyping** - calling variants across many samples together for better accuracy
+  (roadmap).
+- **Annotation** - labelling variants with their likely biological effect and gene context
+  (SnpEff/VEP; roadmap).
+
+### RNA-seq terms (for the roadmap assay)
+- **RNA-seq** - sequencing expressed RNA to measure gene activity (expression).
+- **Spliced alignment** - RNA reads can skip introns, so aligners like STAR/HISAT2 handle gaps
+  that DNA aligners don't.
+- **Pseudo-alignment** - fast expression quantification (e.g. Salmon) without full alignment.
+- **Counts / TPM / CPM** - ways of measuring/normalising how much each gene is expressed.
+- **Differential expression** - finding genes whose expression differs between conditions
+  (DESeq2/edgeR).
+- **Batch effect** - unwanted technical variation (e.g. different sequencing runs) that can
+  masquerade as biological signal and must be detected/corrected.
+
+### Structural & larger variation
+- **Indel** - insertion/deletion (already above); small-scale.
+- **Structural variant (SV)** - larger rearrangements (large deletions, duplications,
+  inversions, translocations); different callers (Manta/Delly) - roadmap.
+
+### Ecosystem
+- **biocontainer** - a community-maintained container image for a specific bioinformatics tool
+  version; the basis of this pipeline's reproducibility.
+- **nf-core** - a community collection of curated, standardised Nextflow pipelines and modules;
+  the style this project mirrors.
+- **nf-test** - the testing framework for Nextflow processes/workflows.
