@@ -110,6 +110,26 @@ def test_compare_vcfs_different(tmp_path: Path) -> None:
     assert "only in B" in result.stdout
 
 
+# --- params schema in sync with nextflow.config ------------------------------
+
+def test_schema_matches_config_params() -> None:
+    import json
+    import re
+
+    config = (REPO_ROOT / "nextflow.config").read_text()
+    # Extract the top-level params { ... } block and its assigned names.
+    block = re.search(r"params\s*\{(.*?)\n\}", config, re.DOTALL).group(1)
+    config_params = set(re.findall(r"^\s*([a-zA-Z_]\w*)\s*=", block, re.MULTILINE))
+
+    schema = json.loads((REPO_ROOT / "nextflow_schema.json").read_text())
+    schema_params = set(schema["properties"])
+
+    assert config_params == schema_params, (
+        f"only in config: {config_params - schema_params}; "
+        f"only in schema: {schema_params - config_params}"
+    )
+
+
 # --- caller_concordance.py ---------------------------------------------------
 
 def test_caller_concordance(tmp_path: Path) -> None:

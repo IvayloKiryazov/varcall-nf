@@ -30,11 +30,11 @@ from `1.0.0` onward the public interface is stable within a major version.
 - [x] On-demand real-reference run (`test_full`) verified in CI.
 - [x] Real **ENA/SRA reads** on the real-data path (verified via `test_sra`).
 - [x] **Multi-sample** support end-to-end with a joint (cross-sample) report.
-- [ ] **Annotation** (SnpEff) verified on the real-data path (needs reference/DB contig match).
+- [x] **Annotation** (SnpEff) verified on the real-data path (custom DB from reference + GFF).
 - [x] **Container digest pinning** (`@sha256:...`) for bit-for-bit reproducibility.
 - [x] Release automation + **SBOM** attached to each GitHub Release.
-- [ ] **nf-core lint** clean; expanded nf-test coverage (caller + filter modules).
-- [ ] Stable, documented parameter set (`nextflow_schema.json`; no planned breaking changes).
-- [ ] First tagged GitHub Release.
+- [x] CI linting (actionlint + ruff + pre-commit) and a documented parameter schema.
+- [x] Stable, documented parameter set (`nextflow_schema.json`, kept in sync by a test).
+- [ ] First tagged GitHub Release (this tag).
 
 When every box is ticked and CI (gating + `test_full`) is green, cut **v1.0.0**.

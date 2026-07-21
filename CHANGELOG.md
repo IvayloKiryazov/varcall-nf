@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.0
+
+First stable release. The pipeline is feature-complete for its scope with a stability contract
+(see `docs/RELEASING.md`):
+
+- Core DNA path: fastp trim -> BWA-MEM -> markdup -> samtools/mosdepth QC -> caller -> bcftools
+  normalise + filter -> stats -> MultiQC.
+- Three callers (`bcftools`, `freebayes`, `gatk`) with a CI correctness matrix.
+- Multi-sample; real reference (`test_full`) and real ENA reads (`test_sra`); custom-DB SnpEff
+  annotation verified on real data.
+- Reproducibility: all images digest-pinned; determinism + golden-VCF snapshot gates.
+- Quality gates: correctness, coverage/mapped-rate SLOs, nf-test, ruff/pytest, pre-commit,
+  actionlint; documented parameter schema kept in sync by a test.
+- Release automation with SBOM; weekly Trivy scan; agent skills, glossary, exercises, roadmap.
+
 ## v0.13.0
 
 - SnpEff annotation reworked to build a **custom database** from the reference + a GFF

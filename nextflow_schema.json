@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/IvayloKiryazov/varcall-nf/main/nextflow_schema.json",
+  "title": "varcall-nf pipeline parameters",
+  "description": "Reproducible, tested, observable DNA variant-calling pipeline.",
+  "type": "object",
+  "properties": {
+    "input": {
+      "type": "string",
+      "description": "Samplesheet CSV (sample,fastq_1,fastq_2). fastq_* may be local paths or URLs.",
+      "default": "assets/samplesheet.csv"
+    },
+    "reference": {
+      "type": "string",
+      "description": "Reference FASTA (plain, .gz, or a URL).",
+      "default": "assets/test_data/reference/ref.fa"
+    },
+    "outdir": {
+      "type": "string",
+      "description": "Output directory.",
+      "default": "results"
+    },
+    "caller": {
+      "type": "string",
+      "description": "Variant caller.",
+      "enum": ["bcftools", "freebayes", "gatk"],
+      "default": "bcftools"
+    },
+    "trim": {
+      "type": "boolean",
+      "description": "Adapter/quality trimming with fastp.",
+      "default": true
+    },
+    "mark_duplicates": {
+      "type": "boolean",
+      "description": "Mark PCR/optical duplicates.",
+      "default": true
+    },
+    "filter_expr": {
+      "type": "string",
+      "description": "bcftools filter expression (soft filter).",
+      "default": "QUAL<20 || INFO/DP<10"
+    },
+    "simulate_reads": {
+      "type": "boolean",
+      "description": "Simulate reads from the reference instead of reading a samplesheet.",
+      "default": false
+    },
+    "sample_id": {
+      "type": "string",
+      "description": "Sample name when simulating reads.",
+      "default": "sim"
+    },
+    "sim_region_length": {
+      "type": "integer",
+      "description": "Bases of the reference to simulate from.",
+      "default": 100000
+    },
+    "sim_coverage": {
+      "type": "integer",
+      "description": "Target depth for simulated reads.",
+      "default": 40
+    },
+    "sim_num_snps": {
+      "type": "integer",
+      "description": "Number of known SNPs to introduce when simulating.",
+      "default": 20
+    },
+    "subsample": {
+      "type": "integer",
+      "description": "Downsample to N read pairs (0 disables).",
+      "default": 0
+    },
+    "annotate": {
+      "type": "boolean",
+      "description": "Functional annotation with a custom SnpEff database.",
+      "default": false
+    },
+    "annotation": {
+      "type": ["string", "null"],
+      "description": "GFF used to build the custom SnpEff database (matched to --reference).",
+      "default": null
+    }
+  },
+  "required": ["input", "reference", "outdir", "caller"]
+}

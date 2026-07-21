@@ -70,7 +70,8 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 - [x] (ENG) `pre-commit` CI job (run the configured hooks in CI).
 - [x] (ENG) Container image scanning (Trivy), weekly + on-demand.
 - [x] (ENG) Release automation (tag-triggered GitHub Release).
-- [ ] (ENG) Parameter JSON schema (nf-core style) + schema-based validation.
+- [x] (ENG) Parameter JSON schema (`nextflow_schema.json`), kept in sync with config by a test.
+- [ ] (ENG) Wire runtime schema validation (nf-schema plugin) on top of the schema.
 - [x] (ENG) SBOM per release (Syft) attached to the GitHub Release.
 - [ ] (ENG) Zenodo integration for a citable DOI on each release.
 
