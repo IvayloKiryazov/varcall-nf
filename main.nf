@@ -7,6 +7,7 @@ include { SAMTOOLS_FAIDX  } from './modules/local/samtools_faidx.nf'
 include { BWA_MEM         } from './modules/local/bwa_mem.nf'
 include { SAMTOOLS_SORT   } from './modules/local/samtools_sort.nf'
 include { BCFTOOLS_CALL   } from './modules/local/bcftools_call.nf'
+include { FREEBAYES       } from './modules/local/freebayes.nf'
 include { BCFTOOLS_STATS  } from './modules/local/bcftools_stats.nf'
 include { MULTIQC         } from './modules/local/multiqc.nf'
 
@@ -28,8 +29,21 @@ workflow {
 
     BWA_MEM(ch_reads, ch_reference, BWA_INDEX.out.index.first())
     SAMTOOLS_SORT(BWA_MEM.out.sam)
-    BCFTOOLS_CALL(SAMTOOLS_SORT.out.bam, ch_reference, SAMTOOLS_FAIDX.out.fai.first())
-    BCFTOOLS_STATS(BCFTOOLS_CALL.out.vcf)
+
+    // Variant calling: pick the caller with --caller (bcftools | freebayes).
+    if (params.caller == 'bcftools') {
+        BCFTOOLS_CALL(SAMTOOLS_SORT.out.bam, ch_reference, SAMTOOLS_FAIDX.out.fai.first())
+        ch_vcf = BCFTOOLS_CALL.out.vcf
+    }
+    else if (params.caller == 'freebayes') {
+        FREEBAYES(SAMTOOLS_SORT.out.bam, ch_reference, SAMTOOLS_FAIDX.out.fai.first())
+        ch_vcf = FREEBAYES.out.vcf
+    }
+    else {
+        error "Unknown --caller '${params.caller}'. Supported: 'bcftools', 'freebayes'."
+    }
+
+    BCFTOOLS_STATS(ch_vcf)
 
     // Aggregate QC (FastQC zips + bcftools stats) into a single MultiQC report.
     ch_reports = FASTQC.out.zip.map { it[1] }

@@ -4,14 +4,34 @@
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A523.04.0-brightgreen)](https://www.nextflow.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A tiny, fully reproducible **DNA variant-calling pipeline** built with **Nextflow (DSL2)**
-and one **biocontainer per step**. It takes paired-end reads from FASTQ all the way to a
-filtered VCF and an aggregated QC report, and it ships with a self-contained test dataset so
-the whole thing runs end-to-end in CI on every push.
+A small, **reproducible, tested, and observable** DNA variant-calling pipeline built with
+**Nextflow (DSL2)** and one pinned **biocontainer per step**. It takes paired-end reads from
+FASTQ to a filtered VCF plus an aggregated QC report, and ships with a self-contained test
+dataset so the whole thing runs end-to-end in CI - and asserts the results are
+*biologically correct*, not just that it ran.
 
-This is a learning / portfolio project: the goal is a small but *correct* and *reproducible*
-genomics workflow that mirrors how real pipeline/bioinformatics-engineering work is done
-(containers, workflow manager, bundled test data, CI that asserts scientific correctness).
+> This is a **learning / portfolio project** - I'm using it to learn bioinformatics in depth,
+> not to make money from it. The engineering (containers, CI, tests, observability/SLOs) plays
+> to my software background; the biology is a deliberate, documented learning journey - see
+> [`docs/ROADMAP.md`](docs/ROADMAP.md) and [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md).
+>
+> AI-assisted implementation is used for boilerplate/syntax; pipeline design and biological
+> interpretation are my own.
+
+## What makes it different
+
+Most genomics portfolios stop at "I ran an aligner." This one is built like a production
+system:
+
+- **Reproducible** - every tool pinned to a container; Nextflow pinned; deterministic test data.
+- **Correctness-tested** - CI asserts the known SNPs are recovered (`bin/check_variants.py`).
+- **Reproducibility-tested** - CI runs the pipeline twice and asserts identical calls
+  (`bin/compare_vcfs.py`).
+- **Observable (SLOs)** - a machine-readable trace is turned into a per-step
+  runtime/CPU/memory report with optional budget gating (`bin/pipeline_metrics.py`,
+  [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md)).
+- **Unit-tested + linted** - pytest + ruff on the Python tooling.
+- **Swappable science** - choose the variant caller with `--caller` (bcftools | freebayes).
 
 ## Workflow
 
@@ -23,24 +43,20 @@ flowchart TD
     R --> F[samtools faidx]
     C --> D
     D --> E[samtools sort + index]
-    E --> G[bcftools mpileup + call]
-    F --> G
-    G --> H[bcftools stats]
+    E --> G{caller}
+    G -->|bcftools| G1[bcftools mpileup + call]
+    G -->|freebayes| G2[freebayes]
+    F --> G1
+    F --> G2
+    G1 --> H[bcftools stats]
+    G2 --> H
     B --> I[MultiQC report]
     H --> I
-    G --> V[(sample.vcf.gz)]
+    G1 --> V[(sample.vcf.gz)]
+    G2 --> V
 ```
 
-| Step | Tool | Container |
-|---|---|---|
-| Read QC | FastQC | `fastqc:0.12.1` |
-| Reference index | BWA | `bwa:0.7.17` |
-| Reference faidx | samtools | `samtools:1.17` |
-| Alignment | BWA-MEM | `bwa:0.7.17` |
-| Sort + index | samtools | `samtools:1.17` |
-| Variant calling | bcftools | `bcftools:1.17` |
-| Variant stats | bcftools | `bcftools:1.17` |
-| Aggregate QC | MultiQC | `multiqc:1.19` |
+See [`docs/PIPELINE.md`](docs/PIPELINE.md) for what each step does and *why*.
 
 ## Requirements
 
@@ -49,65 +65,75 @@ flowchart TD
 
 ## Quick start
 
-Run the bundled test dataset (no external downloads):
-
 ```bash
+# Run the bundled test dataset (no external downloads)
 nextflow run . -profile docker,test --outdir results
+
+# Pick a caller
+nextflow run . -profile docker,test --caller freebayes --outdir results
+
+# See the SLO-style metrics report
+python3 bin/pipeline_metrics.py --trace results/pipeline_info/trace.txt
 ```
 
-Outputs land in `results/`:
+Outputs:
 
 ```
 results/
-├── fastqc/                 # per-sample FastQC reports
-├── alignments/             # sorted, indexed BAMs
-├── variants/               # sample1.vcf.gz (+ .tbi)
-├── stats/                  # bcftools stats
-├── multiqc/                # multiqc_report.html
-└── pipeline_info/          # execution timeline + report
+├── fastqc/          # per-sample FastQC
+├── alignments/      # sorted, indexed BAMs
+├── variants/        # sample1.vcf.gz (+ .tbi)
+├── stats/           # bcftools stats
+├── multiqc/         # multiqc_report.html
+└── pipeline_info/   # trace.txt, timeline/report/dag HTML
 ```
 
-## Run on your own data
+## Parameters
 
-Point the pipeline at your own samplesheet and reference:
+| Param | Default | Description |
+|---|---|---|
+| `--input` | `assets/samplesheet.csv` | CSV: `sample,fastq_1,fastq_2` |
+| `--reference` | bundled 20 kb test genome | Reference FASTA |
+| `--caller` | `bcftools` | Variant caller: `bcftools` or `freebayes` |
+| `--outdir` | `results` | Output directory |
+
+Run on your own data:
 
 ```bash
 nextflow run . -profile docker \
-    --input mysamples.csv \
-    --reference /path/to/genome.fa \
-    --outdir results
-```
-
-`--input` is a CSV with a header and one row per sample:
-
-```csv
-sample,fastq_1,fastq_2
-sample1,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
+    --input mysamples.csv --reference /path/to/genome.fa --outdir results
 ```
 
 ## The test dataset
 
-`bin/generate_test_data.py` deterministically builds a 20 kb reference, mutates a copy of it
-with 10 known SNPs, and simulates ~40x paired-end reads from the mutated copy. Because the
-reads are aligned back to the *unmutated* reference, the pipeline should recover exactly those
-10 SNPs — which is what `bin/check_variants.py` asserts in CI. Regenerate with:
+`bin/generate_test_data.py` deterministically builds a 20 kb reference, mutates a copy with 10
+known SNPs, and simulates ~40x paired-end reads from the mutated copy. Aligning back to the
+*unmutated* reference should recover exactly those 10 SNPs - which is what CI asserts.
+
+## Tests & CI
+
+Three CI jobs run on every push/PR:
+
+1. **quality** - `ruff` lint + `pytest` on the Python tooling.
+2. **test** - runs the pipeline for each caller (`bcftools`, `freebayes`) and asserts the known
+   SNPs are recovered; publishes a metrics summary.
+3. **reproducibility** - runs the pipeline twice and asserts identical variant calls.
+
+Locally:
 
 ```bash
-python3 bin/generate_test_data.py
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements-dev.txt
+ruff check bin tests && pytest
 ```
 
-## Continuous integration
+## Docs
 
-On every push/PR, GitHub Actions installs Nextflow, runs the pipeline with `-profile docker,test`,
-and then runs `check_variants.py` to confirm all known SNPs were called. CI is green only if the
-pipeline both **runs** and produces the **biologically correct** result.
-
-## Ideas / roadmap
-
-- Variant annotation (SnpEff / VEP) and filtering thresholds.
-- Multi-sample joint calling; support for BED target regions.
-- Swap the caller (GATK HaplotypeCaller / DeepVariant) behind a `--caller` param.
-- `nf-test` unit tests per module; `-profile conda` as an alternative to Docker.
+- [`docs/GLOSSARY.md`](docs/GLOSSARY.md) - plain-language definitions of every term.
+- [`docs/PIPELINE.md`](docs/PIPELINE.md) - step-by-step design & decisions.
+- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) - the SLO/metrics angle.
+- [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md) - courses mapped to repo tasks.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) - the big tiered backlog to learn from.
 
 ## License
 
