@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "varcall-nf"
+abstract: "A small, reproducible, tested and observable DNA variant-calling pipeline built with Nextflow DSL2."
+authors:
+  - family-names: "Kiryazov"
+    given-names: "Ivaylo"
+repository-code: "https://github.com/IvayloKiryazov/varcall-nf"
+license: MIT
+keywords:
+  - bioinformatics
+  - nextflow
+  - variant-calling
+  - reproducibility

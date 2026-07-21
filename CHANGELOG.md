@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.0
+
+- Developer ergonomics and repo polish: `Makefile`, `.pre-commit-config.yaml`, PR and issue
+  templates, and `CITATION.cff`.
+- Roadmap expanded with release/QA automation items (pre-commit CI, param schema, Trivy/SBOM,
+  release automation, Zenodo DOI).
+
 ## v0.7.0
 
 - Multi-sample support: the bundled dataset now has two samples (`sample1`, `sample2`) sharing

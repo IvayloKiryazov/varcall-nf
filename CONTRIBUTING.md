@@ -6,15 +6,21 @@ changes. Issues and pull requests are welcome.
 ## Local setup
 
 ```bash
-# Pipeline: needs Nextflow (Java 17+) and Docker
-nextflow run . -profile docker,test --outdir results
+# Common tasks are in the Makefile:
+make setup   # venv + dev dependencies
+make lint    # ruff
+make test    # pytest
+make run     # pipeline on bundled test data
+make run-full  # on-demand real-data (E. coli) run
 
-# Python tooling: tests + linting
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements-dev.txt
-ruff check bin tests
-pytest
+# Or directly:
+nextflow run . -profile docker,test --outdir results
+python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
+ruff check bin tests && pytest
 ```
+
+Optional: `pre-commit install` enables the hooks in `.pre-commit-config.yaml` (ruff +
+whitespace/yaml checks) on every commit.
 
 ## Conventions
 
