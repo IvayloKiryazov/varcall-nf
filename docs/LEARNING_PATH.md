@@ -1,45 +1,35 @@
-# Learning path
+# Background & references
 
-This project is a **learning vehicle**, not a product. The idea: pair a course with this repo
-and turn each concept into a commit. You bring the engineering rigor (CI, tests, containers,
-observability); the courses fill in the biology and stats.
+This project pairs software-engineering practice (reproducibility, testing, CI/CD,
+observability) with genomics analysis. This page lists the domain references it draws on and
+records how the two areas map onto the codebase.
 
-## Suggested courses (Coursera unless noted)
+## Domain references
 
-1. **Genomic Data Science Specialization - Johns Hopkins** - most job-aligned: command-line
-   genomics (samtools, bowtie/BWA), Python, Galaxy, Bioconductor, and biostatistics.
-2. **Bioinformatics Specialization - UC San Diego (Pevzner)** - algorithmic foundations
-   (assembly, alignment, sequence comparison); very CS-friendly.
-3. **Statistics with Python - University of Michigan** (or JHU biostatistics) - close the
-   stats gap; this is the most common weak spot for engineers pivoting in.
-4. Free + Europe-relevant: **EMBL-EBI On-demand Training** (Ensembl, sequence analysis).
+- **Genomic Data Science Specialization - Johns Hopkins** - command-line genomics (samtools,
+  aligners), Python, Galaxy, Bioconductor, and biostatistics.
+- **Bioinformatics Specialization - UC San Diego** - algorithmic foundations (assembly,
+  alignment, sequence comparison).
+- **Statistics with Python - University of Michigan** - statistical grounding for analysis.
+- **EMBL-EBI On-demand Training** - Ensembl and sequence-analysis material.
 
-## Map: concept -> what to do in this repo
+## Concept-to-code map
 
-| Once you've learned... | Do this here |
+| Concept | Where it appears in this repo |
 |---|---|
-| FASTQ, reads, quality scores | Read `docs/GLOSSARY.md`; open the FastQC report in `results/fastqc/` |
-| Reference genomes, indexing | Understand `BWA_INDEX` / `SAMTOOLS_FAIDX`; try a real reference |
-| Alignment (BWA-MEM) | Read `modules/local/bwa_mem.nf`; inspect a BAM with `samtools view` |
-| SAM/BAM, sorting, flags | Explore `results/alignments/`; run `samtools flagstat` |
-| Variant calling | Compare `--caller bcftools` vs `--caller freebayes` with `bin/compare_vcfs.py` |
-| VCF format, genotypes | Open `results/variants/*.vcf.gz`; read `bcftools stats` output |
-| QC aggregation | Open the MultiQC report in `results/multiqc/` |
-| RNA-seq | Do the RNA-seq roadmap item (STAR/Salmon + counts) |
-| Annotation, filtering | Do the SnpEff/VEP and filtering roadmap items |
+| FASTQ, reads, quality scores | `docs/GLOSSARY.md`; FastQC / fastp reports under `results/` |
+| Reference indexing | `modules/local/bwa_index.nf`, `samtools_faidx.nf` |
+| Alignment | `modules/local/bwa_mem.nf`; BAMs under `results/alignments/` |
+| Duplicate marking | `modules/local/markdup.nf` |
+| Variant calling | `modules/local/bcftools_call.nf`, `freebayes.nf` (`--caller`) |
+| Normalisation & filtering | `modules/local/bcftools_norm.nf`, `bcftools_filter.nf` |
+| QC aggregation | `modules/local/multiqc.nf`; `results/multiqc/` |
+| Caller comparison | `bin/compare_vcfs.py` |
+| Observability / SLOs | `bin/pipeline_metrics.py`; `docs/OBSERVABILITY.md` |
 
-## How to use AI honestly while learning
+## AI assistance policy
 
-Being transparent about AI assistance is normal in 2026 and expected. The rule of thumb:
-
-- **Fine to lean on AI**: Nextflow/Docker/CI boilerplate, argparse scaffolding, syntax you
-  haven't learned yet (R/Bioconductor, etc.).
-- **Do NOT outsource the understanding**: *why* BWA over another aligner, *what* a batch
-  effect is and why you'd correct for it, *what* the caller is actually doing. That's the exact
-  gap you're closing - if you can't explain a design choice in an interview, it hurts you.
-- **State it plainly**: "AI-assisted implementation; pipeline design and biological
-  interpretation are my own." Nobody blinks at that; not being able to explain a decision is
-  what kills credibility.
-
-For each roadmap item, write a short note in your own words (in the PR description or a
-`docs/notes/` file) explaining the biology - that's your interview prep.
+AI tools assist with boilerplate and unfamiliar syntax (Nextflow/Docker/CI configuration,
+argparse scaffolding). Pipeline design decisions and biological interpretation are the
+author's own. Each roadmap item is accompanied by a short rationale in its pull request
+describing the analysis choices made.

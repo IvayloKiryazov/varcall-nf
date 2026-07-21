@@ -118,3 +118,55 @@ def test_pipeline_metrics_report_and_slo(tmp_path: Path) -> None:
     )
     assert enforced.returncode == 1
     assert "SLO breaches" in enforced.stdout
+
+
+# --- validate_samplesheet.py -------------------------------------------------
+
+def test_validate_samplesheet_ok(tmp_path: Path) -> None:
+    r1, r2 = tmp_path / "a_1.fq.gz", tmp_path / "a_2.fq.gz"
+    r1.write_text("")
+    r2.write_text("")
+    sheet = tmp_path / "sheet.csv"
+    sheet.write_text(f"sample,fastq_1,fastq_2\nsampleA,{r1},{r2}\n")
+    result = run("validate_samplesheet.py", str(sheet), "--check-files")
+    assert result.returncode == 0
+    assert "OK" in result.stdout
+
+
+def test_validate_samplesheet_duplicate_and_missing(tmp_path: Path) -> None:
+    sheet = tmp_path / "sheet.csv"
+    sheet.write_text(
+        "sample,fastq_1,fastq_2\n"
+        "s1,/no/such_1.fq.gz,/no/such_2.fq.gz\n"
+        "s1,/no/other_1.fq.gz,/no/other_2.fq.gz\n"
+    )
+    result = run("validate_samplesheet.py", str(sheet), "--check-files")
+    assert result.returncode == 1
+    assert "duplicate sample" in result.stdout
+    assert "not found" in result.stdout
+
+
+def test_validate_samplesheet_missing_column(tmp_path: Path) -> None:
+    sheet = tmp_path / "sheet.csv"
+    sheet.write_text("sample,fastq_1\ns1,x_1.fq.gz\n")
+    result = run("validate_samplesheet.py", str(sheet))
+    assert result.returncode == 1
+    assert "Missing required column" in result.stdout
+
+
+# --- check_qc.py -------------------------------------------------------------
+
+def test_check_qc_pass_and_fail(tmp_path: Path) -> None:
+    stats = tmp_path / "s.txt"
+    stats.write_text(
+        "# comment\n"
+        "SN\traw total sequences:\t1000\n"
+        "SN\treads mapped:\t980\n"
+    )
+    ok = run("check_qc.py", str(stats), "--min-mapped-rate", "0.90")
+    assert ok.returncode == 0
+    assert "PASS" in ok.stdout
+
+    bad = run("check_qc.py", str(stats), "--min-mapped-rate", "0.99")
+    assert bad.returncode == 1
+    assert "FAIL" in bad.stdout

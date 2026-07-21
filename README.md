@@ -10,13 +10,10 @@ FASTQ to a filtered VCF plus an aggregated QC report, and ships with a self-cont
 dataset so the whole thing runs end-to-end in CI - and asserts the results are
 *biologically correct*, not just that it ran.
 
-> This is a **learning / portfolio project** - I'm using it to learn bioinformatics in depth,
-> not to make money from it. The engineering (containers, CI, tests, observability/SLOs) plays
-> to my software background; the biology is a deliberate, documented learning journey - see
-> [`docs/ROADMAP.md`](docs/ROADMAP.md) and [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md).
->
-> AI-assisted implementation is used for boilerplate/syntax; pipeline design and biological
-> interpretation are my own.
+> A portfolio project demonstrating production-grade engineering practices - reproducibility,
+> automated testing, and observability/SLOs - applied to a bioinformatics workflow. The
+> [roadmap](docs/ROADMAP.md) tracks planned enhancements across both engineering and analysis.
+> AI-assisted implementation; pipeline design and biological interpretation are the author's own.
 
 ## What makes it different
 
@@ -38,22 +35,27 @@ system:
 ```mermaid
 flowchart TD
     A[Paired-end FASTQ] --> B[FastQC]
-    A --> D[BWA-MEM align]
+    A --> T[fastp trim]
     R[Reference FASTA] --> C[BWA index]
     R --> F[samtools faidx]
+    T --> D[BWA-MEM align]
     C --> D
-    D --> E[samtools sort + index]
+    D --> E[markdup / sort + index]
+    E --> ST[samtools stats]
     E --> G{caller}
     G -->|bcftools| G1[bcftools mpileup + call]
     G -->|freebayes| G2[freebayes]
     F --> G1
     F --> G2
-    G1 --> H[bcftools stats]
-    G2 --> H
+    G1 --> N[bcftools norm]
+    G2 --> N
+    N --> FL[bcftools filter]
+    FL --> V[(sample.vcf.gz)]
+    FL --> H[bcftools stats]
     B --> I[MultiQC report]
+    T --> I
+    ST --> I
     H --> I
-    G1 --> V[(sample.vcf.gz)]
-    G2 --> V
 ```
 
 See [`docs/PIPELINE.md`](docs/PIPELINE.md) for what each step does and *why*.
@@ -81,9 +83,10 @@ Outputs:
 ```
 results/
 ├── fastqc/          # per-sample FastQC
-├── alignments/      # sorted, indexed BAMs
-├── variants/        # sample1.vcf.gz (+ .tbi)
-├── stats/           # bcftools stats
+├── fastp/           # trimming reports (json/html)
+├── alignments/      # dup-marked, sorted, indexed BAMs
+├── variants/        # sample1.vcf.gz (+ .tbi) - normalised + filtered
+├── stats/           # samtools stats + bcftools stats
 ├── multiqc/         # multiqc_report.html
 └── pipeline_info/   # trace.txt, timeline/report/dag HTML
 ```
@@ -95,6 +98,9 @@ results/
 | `--input` | `assets/samplesheet.csv` | CSV: `sample,fastq_1,fastq_2` |
 | `--reference` | bundled 20 kb test genome | Reference FASTA |
 | `--caller` | `bcftools` | Variant caller: `bcftools` or `freebayes` |
+| `--trim` | `true` | Adapter/quality trimming with fastp |
+| `--mark_duplicates` | `true` | Mark PCR/optical duplicates |
+| `--filter_expr` | `QUAL<20 \|\| INFO/DP<10` | bcftools soft-filter expression |
 | `--outdir` | `results` | Output directory |
 
 Run on your own data:

@@ -1,7 +1,7 @@
 # Glossary (plain language)
 
-If you're coming from software engineering and the biology words are new, start here. These
-are intentionally informal - accuracy over jargon.
+A quick reference for the biology terms used across this repository, aimed at readers with a
+software background. Definitions are intentionally informal - approachable over exhaustive.
 
 ### Sequencing & data formats
 - **DNA / genome** - the long string of letters A, C, G, T that encodes an organism. The
@@ -45,7 +45,7 @@ are intentionally informal - accuracy over jargon.
 - **MultiQC** - aggregates many tool reports (FastQC, bcftools stats, ...) into one HTML page.
 - **QC (quality control)** - checking the data/results are trustworthy before/while analyzing.
 
-### Engineering terms you already know, applied here
+### Engineering terms, as applied here
 - **Reproducibility** - re-running the pipeline gives the same results. Achieved via pinned
   tool versions (containers) and deterministic inputs. See `bin/compare_vcfs.py`.
 - **Observability / SLO** - measuring runtime/CPU/memory per step and setting budgets. See

@@ -1,61 +1,52 @@
-# Pipeline design & decisions
+# Pipeline design & rationale
 
-This explains *what each step does* and *why it's there* - the part you should be able to
-talk through in an interview. (Terms are defined in [GLOSSARY.md](GLOSSARY.md).)
+What each step does and why it is included. (Terms are defined in [GLOSSARY.md](GLOSSARY.md).)
 
-## The flow
+## Flow
 
 ```
 FASTQ (paired reads)
-   │
-   ├─► FastQC ─────────────────────────────┐   (read quality report)
-   │                                         │
-Reference FASTA                              │
-   ├─► BWA index                            │
-   ├─► samtools faidx                       │
-   │                                         │
-reads + index ─► BWA-MEM ─► samtools sort ─► BAM (sorted, indexed)
-                                             │
-BAM + reference ─► variant caller ──────────► VCF (.vcf.gz + .tbi)
-   (bcftools mpileup+call  OR  freebayes)     │
-                                             ├─► bcftools stats ─┐
-                                             │                    ├─► MultiQC report
-                                             └────────────────────┘
+   ├─► FastQC ─────────────────────────────────────────────┐  (raw read QC)
+   └─► fastp (trim) ─► BWA-MEM ─► markdup ─► sorted BAM ─────┤
+Reference FASTA                                              │
+   ├─► BWA index (feeds BWA-MEM)                             ├─► samtools stats ─┐
+   └─► samtools faidx (feeds caller/normalise)              │                    │
+sorted BAM + reference ─► caller ─► bcftools norm ─► bcftools filter ─► VCF      │
+      (bcftools mpileup+call | freebayes)                    │                   ├─► MultiQC
+                                                             └─► bcftools stats ─┘
 ```
 
-## Step-by-step
+## Steps
 
-1. **FastQC** - quick quality report on the raw reads. In a real project you'd inspect this
-   before trusting anything downstream (adapter contamination, quality drop-off, etc.).
-2. **BWA index** - builds a searchable index of the reference so alignment is fast. Done once
-   per reference.
-3. **samtools faidx** - a lightweight `.fai` index of the reference FASTA; variant callers
-   need it to random-access the reference.
-4. **BWA-MEM** - aligns each read pair to the reference. We attach a read group (`@RG`) so the
-   caller knows the sample. Output is SAM.
-5. **samtools sort + index** - sorts alignments by genomic position and indexes them; nearly
-   every downstream tool requires coordinate-sorted, indexed BAMs.
-6. **Variant calling** (`--caller`):
-   - **bcftools** (`mpileup | call -mv`) - pileup-based caller; fast and simple.
-   - **freebayes** - haplotype-based Bayesian caller; different model, useful for comparison.
-7. **bcftools stats** - summary numbers about the VCF (counts of SNPs/indels, Ts/Tv, ...).
-8. **MultiQC** - rolls FastQC + bcftools stats into one shareable HTML report.
+1. **FastQC** - quality report on the raw reads (adapter content, per-base quality, etc.).
+2. **fastp** (`--trim`) - adapter/quality trimming; emits its own QC report for MultiQC.
+3. **BWA index / samtools faidx** - prepare the reference for alignment and calling.
+4. **BWA-MEM** - align read pairs to the reference; attaches a read group (`@RG`).
+5. **markdup** (`--mark_duplicates`) - name-sort, fixmate, coordinate-sort, then mark PCR/optical
+   duplicates so they don't inflate allele support. Falls back to a plain sort when disabled.
+6. **samtools stats** - alignment metrics, consumed by the data-quality gate and MultiQC.
+7. **Variant calling** (`--caller`): `bcftools` (pileup-based) or `freebayes` (haplotype-based).
+8. **bcftools norm** - left-align and normalise variants so callers are comparable.
+9. **bcftools filter** (`--filter_expr`) - soft-filter low-quality/low-depth calls; produces the
+   final published VCF.
+10. **bcftools stats** - summary of the final call set.
+11. **MultiQC** - aggregates all QC into one HTML report.
 
-## Why these choices
+## Rationale
 
-- **BWA-MEM**: the de-facto standard for short-read DNA alignment; well documented and fast.
-  *Learning task: understand why it isn't used for RNA-seq (spliced alignment) - see ROADMAP.*
-- **bcftools as default caller**: minimal, deterministic, no reference "known-sites" needed,
-  so it's ideal for a tiny reproducible demo. **freebayes** is included to show that swapping
-  the scientific method is a first-class, testable change - not a rewrite.
-- **One container per process**: every tool version is pinned to a biocontainer image. This is
-  what makes the pipeline reproducible and is the backbone of the CI story.
-- **Nextflow DSL2 with per-step modules**: mirrors how production pipelines (e.g. nf-core) are
-  structured, so the patterns transfer to real jobs.
+- **BWA-MEM**: standard short-read DNA aligner; fast and well documented. (RNA-seq needs a
+  spliced aligner such as STAR/HISAT2 - tracked in the roadmap.)
+- **bcftools as default caller**: minimal and deterministic, and needs no external
+  "known-sites" resource, which suits a small reproducible demo. **freebayes** is included to
+  show that changing the scientific method is a first-class, testable configuration change.
+- **normalise + soft filter**: makes call sets from different callers comparable and encodes
+  quality thresholds explicitly rather than implicitly.
+- **One container per process**: every tool version is pinned, which underpins reproducibility
+  and the CI story.
+- **DSL2 per-step modules**: mirrors production pipeline structure (e.g. nf-core), so the
+  patterns are transferable.
 
-## Known simplifications (deliberate, documented)
+## Deliberate simplifications
 
-This is a learning pipeline, not a clinical one. It intentionally skips several things a
-production DNA pipeline would include - duplicate marking, base-quality recalibration,
-variant filtering/annotation, joint genotyping. Each is a roadmap item so you can add it and
-learn it. See [ROADMAP.md](ROADMAP.md).
+This is a demonstration pipeline, not a clinical one. Base-quality recalibration, joint
+genotyping, and annotation are intentionally left as roadmap items. See [ROADMAP.md](ROADMAP.md).

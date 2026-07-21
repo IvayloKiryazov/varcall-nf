@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.3.0
+
+Expanded analysis steps, more engineering gates, and public-facing documentation.
+
+- Analysis: adapter/quality trimming (fastp), duplicate marking (samtools markdup), variant
+  normalisation (bcftools norm) and soft filtering (bcftools filter); samtools stats added to
+  the QC aggregation.
+- Engineering: samplesheet pre-flight validation (`bin/validate_samplesheet.py`), alignment
+  data-quality gate (`bin/check_qc.py`), and Singularity/Apptainer profiles.
+- New params: `--trim`, `--mark_duplicates`, `--filter_expr`.
+- CI: added samplesheet validation and a data-quality gate; expanded test coverage.
+- Docs rewritten in a neutral, public-facing voice; roadmap reorganised by theme with a
+  larger backlog.
+
 ## v0.2.0
 
 Expanded into a "reproducible, tested, observable" learning pipeline.

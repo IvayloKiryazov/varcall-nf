@@ -1,8 +1,8 @@
 # Observability & SLOs for a genomics pipeline
 
-Most bioinformatics repos stop at "it produced a VCF." This project treats the pipeline like
-a production system you can measure - which is the differentiating angle if you come from a
-CI/CD + SLO background.
+Many bioinformatics pipelines stop at "it produced a VCF." This project additionally treats
+the pipeline as a measurable production system: per-step performance is captured and can be
+gated against budgets.
 
 ## What's wired up
 
@@ -25,16 +25,16 @@ python3 bin/pipeline_metrics.py --trace results/pipeline_info/trace.txt \
     --max-step-seconds 120 --max-rss-mib 2048 --enforce
 ```
 
-## Why this matters (interview-ready framing)
+## Why this matters
 
-- **Cost & scale**: genomics steps vary wildly in runtime/memory; knowing the per-step profile
-  is how you right-size resources and control cloud cost.
-- **Regressions**: an SLO gate catches "this step got 3x slower/heavier" the same way you'd
-  catch a latency regression in a service.
-- **Transferable skill**: this is exactly the SLO/telemetry work described on the CV, applied
-  to a scientific workflow.
+- **Cost & scale**: genomics steps vary widely in runtime/memory; a per-step profile is how
+  resources are right-sized and cloud cost is controlled.
+- **Regressions**: an SLO gate catches "this step got 3x slower/heavier" the same way a
+  service latency regression would be caught.
+- **Transferability**: the same SLO/telemetry approach used for production services, applied to
+  a scientific workflow.
 
-## Learning extensions (see ROADMAP)
+## Planned extensions (see ROADMAP)
 
 - Push metrics to a time-series store / Grafana instead of a Markdown table.
 - Add **data-quality** SLOs (e.g. minimum mean coverage, maximum duplicate rate) alongside the

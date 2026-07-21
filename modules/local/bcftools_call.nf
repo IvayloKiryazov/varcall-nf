@@ -1,7 +1,6 @@
 process BCFTOOLS_CALL {
     tag "${sample}"
     container 'quay.io/biocontainers/bcftools:1.17--haef29d1_0'
-    publishDir "${params.outdir}/variants", mode: 'copy'
 
     input:
     tuple val(sample), path(bam), path(bai)
@@ -9,12 +8,12 @@ process BCFTOOLS_CALL {
     path fai
 
     output:
-    tuple val(sample), path("${sample}.vcf.gz"), path("${sample}.vcf.gz.tbi"), emit: vcf
+    tuple val(sample), path("${sample}.raw.vcf.gz"), path("${sample}.raw.vcf.gz.tbi"), emit: vcf
 
     script:
     """
     bcftools mpileup -f ${reference} ${bam} \\
-        | bcftools call -mv -Oz -o ${sample}.vcf.gz
-    bcftools index -t ${sample}.vcf.gz
+        | bcftools call -mv -Oz -o ${sample}.raw.vcf.gz
+    bcftools index -t ${sample}.raw.vcf.gz
     """
 }

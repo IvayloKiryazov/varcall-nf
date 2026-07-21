@@ -1,8 +1,7 @@
-# Contributing / working notes
+# Contributing
 
-This is a personal **learning** project (not a commercial product). It's public so it can
-double as a portfolio piece. Contributions/forks welcome, but the primary "contributor" is
-future-me working through [docs/ROADMAP.md](docs/ROADMAP.md).
+This is a portfolio project; the roadmap in [`docs/ROADMAP.md`](docs/ROADMAP.md) drives most
+changes. Issues and pull requests are welcome.
 
 ## Local setup
 
@@ -19,14 +18,16 @@ pytest
 
 ## Conventions
 
-- Keep every tool pinned to a container; never rely on host-installed bioinformatics tools.
-- Every new pipeline feature should keep the three CI gates green: **correctness**
-  (known SNPs recovered), **reproducibility** (determinism), **quality** (ruff + pytest).
-- Prefer adding a small test over adding a comment.
-- When you implement a roadmap item, write the biology explanation in your own words in the
-  PR description (this is interview prep, not busywork).
+- Every tool is pinned to a container; the pipeline does not rely on host-installed
+  bioinformatics tools.
+- New features should keep the CI gates green: **correctness** (known SNPs recovered),
+  **reproducibility** (deterministic calls), **data quality** (alignment thresholds), and
+  **quality** (ruff + pytest).
+- Prefer adding a test over adding a comment.
+- Pull requests that implement a roadmap item should include a short rationale for the
+  analysis/design choices made.
 
-## AI usage
+## AI assistance
 
-AI-assisted implementation is used for boilerplate and syntax. Pipeline design and biological
-interpretation are the author's own. See `docs/LEARNING_PATH.md` for the full stance.
+AI tools are used for boilerplate and unfamiliar syntax. Pipeline design and biological
+interpretation are the author's own.

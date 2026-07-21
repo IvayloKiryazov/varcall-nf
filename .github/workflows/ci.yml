@@ -24,6 +24,8 @@ jobs:
         run: ruff check bin tests
       - name: Pytest (unit/integration)
         run: pytest
+      - name: Validate bundled samplesheet
+        run: python3 bin/validate_samplesheet.py assets/samplesheet.csv --check-files
 
   test:
     name: Pipeline + correctness (${{ matrix.caller }})
@@ -50,6 +52,11 @@ jobs:
           python3 bin/check_variants.py \
             --vcf results/variants/sample1.vcf.gz \
             --truth assets/test_data/truth_snps.tsv
+      - name: Data-quality gate (alignment)
+        run: |
+          python3 bin/check_qc.py \
+            results/stats/sample1.samtools_stats.txt \
+            --min-mapped-rate 0.90
       - name: Publish pipeline metrics to job summary
         if: always()
         run: |
