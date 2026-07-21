@@ -24,11 +24,19 @@ include { MULTIQC         } from './modules/local/multiqc.nf'
 
 workflow {
 
-    // Reads + reference: either simulate from a (possibly remote/gzipped) reference
-    // (--simulate_reads, used by -profile test_full), or read a local samplesheet.
-    if (params.simulate_reads) {
+    // Reference: gunzip/normalise when gzipped or remote or when simulating; otherwise use
+    // the local plain FASTA directly (keeps the default path free of an extra process).
+    if (params.simulate_reads || params.reference.toString().endsWith('.gz')) {
         PREPARE_REFERENCE(Channel.value(file(params.reference, checkIfExists: true)))
         ch_reference = PREPARE_REFERENCE.out.fasta.first()
+    }
+    else {
+        ch_reference = Channel.value(file(params.reference, checkIfExists: true))
+    }
+
+    // Reads: simulate from the reference (--simulate_reads), or read a samplesheet
+    // (fastq_1/fastq_2 may be local paths or http(s)/ftp URLs, which Nextflow stages).
+    if (params.simulate_reads) {
         SIMULATE_READS(ch_reference.map { ref -> tuple(params.sample_id, ref) })
         ch_reads = SIMULATE_READS.out.reads
     }
@@ -38,7 +46,6 @@ workflow {
             .splitCsv(header: true)
             .map { row -> tuple(row.sample, [file(row.fastq_1, checkIfExists: true),
                                              file(row.fastq_2, checkIfExists: true)]) }
-        ch_reference = Channel.value(file(params.reference, checkIfExists: true))
     }
 
     FASTQC(ch_reads)

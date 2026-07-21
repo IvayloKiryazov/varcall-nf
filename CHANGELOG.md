@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.0
+
+- Reproducibility: every container image is now pinned by `@sha256` digest.
+- Reference handling generalised - gzipped/remote references are gunzipped via
+  `PREPARE_REFERENCE`; samplesheet `fastq_*` entries may be local paths or URLs (enables
+  real-data inputs). The default local-plain-FASTA path is unchanged.
+
 ## v0.8.0
 
 - Developer ergonomics and repo polish: `Makefile`, `.pre-commit-config.yaml`, PR and issue

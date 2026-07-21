@@ -1,6 +1,6 @@
 process TRIM_FASTP {
     tag "${sample}"
-    container 'quay.io/biocontainers/fastp:0.23.4--h5f740d0_0'
+    container 'quay.io/biocontainers/fastp:0.23.4--h5f740d0_0@sha256:b635334b6bb25eba14d0b8c240a45a51234984247d79715f8cd0b7959df850c2'
     publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*.{json,html}'
 
     input:

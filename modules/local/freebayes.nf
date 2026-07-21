@@ -1,6 +1,6 @@
 process FREEBAYES {
     tag "${sample}"
-    container 'quay.io/biocontainers/freebayes:1.3.6--hbfe0e7f_2'
+    container 'quay.io/biocontainers/freebayes:1.3.6--hbfe0e7f_2@sha256:8b5ef4527d53a36c9beed1ef4fa2242bacc1087aca21dc43d3fb079151ac9564'
 
     input:
     tuple val(sample), path(bam), path(bai)

@@ -1,7 +1,7 @@
 process SIMULATE_READS {
     tag "${sample}"
     // Full python image (not -slim) because it ships procps/ps, which Nextflow needs for metrics.
-    container 'python:3.11'
+    container 'python:3.11@sha256:c7220863385ee39fb6d822da81f4469d0cd33ff893d92ce94105e5c3f4b95fe2'
     publishDir "${params.outdir}/simulated", mode: 'copy', pattern: '*.truth.tsv'
 
     input:

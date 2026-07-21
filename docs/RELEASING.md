@@ -31,7 +31,7 @@ from `1.0.0` onward the public interface is stable within a major version.
 - [ ] Real **ENA/SRA reads** on the real-data path (not only simulated).
 - [x] **Multi-sample** support end-to-end with a joint (cross-sample) report.
 - [ ] **Annotation** (SnpEff) verified on the real-data path.
-- [ ] **Container digest pinning** (`@sha256:...`) for bit-for-bit reproducibility.
+- [x] **Container digest pinning** (`@sha256:...`) for bit-for-bit reproducibility.
 - [ ] **nf-core lint** clean; expanded nf-test coverage (caller + filter modules).
 - [ ] Stable, documented parameter set (no planned breaking changes).
 - [ ] First tagged GitHub Release with signed changelog notes.
