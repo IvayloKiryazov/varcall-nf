@@ -1,0 +1,7 @@
+transcript	weight	expected_fraction
+tx1	32	0.5079
+tx2	16	0.2540
+tx3	8	0.1270
+tx4	4	0.0635
+tx5	2	0.0317
+tx6	1	0.0159

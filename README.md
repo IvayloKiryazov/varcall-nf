@@ -126,6 +126,15 @@ For **real sequencing reads**, `-profile test_sra` streams a real *E. coli* run 
 nextflow run . -profile docker,test_sra --outdir results_sra
 ```
 
+### RNA-seq (second assay)
+
+A separate entry point quantifies transcript expression with Salmon (pseudo-alignment) and
+asserts the known expression ranking is recovered:
+
+```bash
+nextflow run rnaseq.nf -profile docker --outdir results_rna
+```
+
 Run on your own data:
 
 ```bash
@@ -162,6 +171,7 @@ ruff check bin tests && pytest
 
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) - plain-language definitions of every term.
 - [`docs/PIPELINE.md`](docs/PIPELINE.md) - step-by-step design & decisions.
+- [`docs/DESIGN_AND_BIOLOGY.md`](docs/DESIGN_AND_BIOLOGY.md) - deeper biology + rationale (DNA & RNA).
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) - the SLO/metrics angle.
 - [`docs/LEARNING_PATH.md`](docs/LEARNING_PATH.md) - domain references + concept-to-code map.
 - [`docs/EXERCISES.md`](docs/EXERCISES.md) - progressive hands-on exercises.

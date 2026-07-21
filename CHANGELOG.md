@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.1.0
+
+- Second assay: **RNA-seq** transcript quantification with Salmon (`rnaseq.nf`), a
+  self-contained expression test dataset, and an expression-ranking correctness gate
+  (`bin/check_expression.py`, Spearman) run as a dedicated CI job.
+- New study doc `docs/DESIGN_AND_BIOLOGY.md` explaining the biology + rationale of every step
+  (DNA and RNA).
+
 ## v1.0.0
 
 First stable release. The pipeline is feature-complete for its scope with a stability contract

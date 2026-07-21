@@ -30,6 +30,53 @@ def write_vcf_gz(path: Path, records: list[tuple[str, int, str, str]]) -> None:
             fh.write(f"{chrom}\t{pos}\t.\t{ref}\t{alt}\t60\t.\t.\n")
 
 
+# --- generate_rnaseq_data.py -------------------------------------------------
+
+def test_generate_rnaseq_data(tmp_path: Path) -> None:
+    out1, out2 = tmp_path / "a", tmp_path / "b"
+    for out in (out1, out2):
+        result = run("generate_rnaseq_data.py", "--outdir", str(out), "--num-transcripts", "4")
+        assert result.returncode == 0, result.stderr
+    truth = (out1 / "truth_expression.tsv").read_text().splitlines()
+    assert len(truth) == 1 + 4
+    assert (out1 / "transcriptome.fa").read_text().count(">") == 4
+    with gzip.open(out1 / "reads.fastq.gz") as a, gzip.open(out2 / "reads.fastq.gz") as b:
+        assert a.read() == b.read()
+
+
+# --- check_expression.py -----------------------------------------------------
+
+def test_check_expression(tmp_path: Path) -> None:
+    truth = tmp_path / "truth.tsv"
+    truth.write_text(
+        "transcript\tweight\texpected_fraction\n"
+        "tx1\t8\t0.5\ntx2\t4\t0.25\ntx3\t2\t0.125\ntx4\t1\t0.0625\n"
+    )
+    good = tmp_path / "good.sf"
+    good.write_text(
+        "Name\tLength\tEffectiveLength\tTPM\tNumReads\n"
+        "tx1\t1000\t900\t500000\t8000\n"
+        "tx2\t1000\t900\t250000\t4000\n"
+        "tx3\t1000\t900\t125000\t2000\n"
+        "tx4\t1000\t900\t62500\t1000\n"
+    )
+    ok = run("check_expression.py", "--quant", str(good), "--truth", str(truth))
+    assert ok.returncode == 0
+    assert "PASS" in ok.stdout
+
+    bad = tmp_path / "bad.sf"
+    bad.write_text(
+        "Name\tLength\tEffectiveLength\tTPM\tNumReads\n"
+        "tx1\t1000\t900\t62500\t1000\n"
+        "tx2\t1000\t900\t125000\t2000\n"
+        "tx3\t1000\t900\t250000\t4000\n"
+        "tx4\t1000\t900\t500000\t8000\n"
+    )
+    fail = run("check_expression.py", "--quant", str(bad), "--truth", str(truth))
+    assert fail.returncode == 1
+    assert "FAIL" in fail.stdout
+
+
 # --- generate_test_data.py ---------------------------------------------------
 
 def test_simulate_reads_from_reference(tmp_path: Path) -> None:

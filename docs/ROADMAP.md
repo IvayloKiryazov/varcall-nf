@@ -51,8 +51,10 @@ Legend: `[x]` implemented · `[ ]` planned · (ENG) engineering/tooling · (BIO)
 
 ## Second assay: RNA-seq
 
-- [ ] (BIO) RNA-seq path: STAR/HISAT2 spliced alignment or Salmon pseudo-alignment.
-- [ ] (BIO) Gene-count matrix + normalisation (TPM/CPM).
+- [x] (BIO) RNA-seq path: Salmon pseudo-alignment quantification (`rnaseq.nf`) + expression
+      correctness gate (`check_expression.py`).
+- [ ] (BIO) STAR/HISAT2 spliced genome alignment as an alternative to Salmon.
+- [ ] (BIO) Gene-count matrix across samples + normalisation (TPM/CPM).
 - [ ] (BIO) Differential-expression step (DESeq2/edgeR in a Bioconductor container).
 - [ ] (BIO) Batch-effect detection/correction and documentation.
 
