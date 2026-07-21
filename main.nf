@@ -112,9 +112,9 @@ workflow {
 
     BCFTOOLS_STATS(ch_vcf)
 
-    // Optional functional annotation (needs a matching snpeff_db; used on real-data runs).
+    // Optional functional annotation: builds a custom SnpEff DB from the reference + a GFF.
     if (params.annotate) {
-        SNPEFF(ch_vcf)
+        SNPEFF(ch_vcf, ch_reference, Channel.value(file(params.annotation, checkIfExists: true)))
     }
 
     // Aggregate QC (FastQC + fastp + samtools stats + mosdepth + bcftools stats) into MultiQC.

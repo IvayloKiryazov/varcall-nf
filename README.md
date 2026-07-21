@@ -101,7 +101,8 @@ results/
 | `--trim` | `true` | Adapter/quality trimming with fastp |
 | `--mark_duplicates` | `true` | Mark PCR/optical duplicates |
 | `--filter_expr` | `QUAL<20 \|\| INFO/DP<10` | bcftools soft-filter expression |
-| `--annotate` | `false` | Functional annotation with SnpEff (needs `--snpeff_db`) |
+| `--annotate` | `false` | Functional annotation with SnpEff (needs `--annotation`) |
+| `--annotation` | `null` | GFF used to build a custom SnpEff DB (matched to `--reference`) |
 | `--simulate_reads` | `false` | Simulate reads from `--reference` (see `-profile test_full`) |
 | `--outdir` | `results` | Output directory |
 

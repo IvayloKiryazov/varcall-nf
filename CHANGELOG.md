@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.13.0
+
+- SnpEff annotation reworked to build a **custom database** from the reference + a GFF
+  (`--annotation`), so contig names match by construction. Enabled in `-profile test_full`.
+
 ## v0.12.0
 
 - Release workflow now generates and attaches an SPDX **SBOM**.

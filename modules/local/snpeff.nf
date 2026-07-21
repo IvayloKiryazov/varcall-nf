@@ -5,12 +5,25 @@ process SNPEFF {
 
     input:
     tuple val(sample), path(vcf), path(tbi)
+    path reference
+    path annotation
 
     output:
     tuple val(sample), path("${sample}.annotated.vcf"), emit: vcf
+    path "snpEff_summary.html", optional: true
 
     script:
+    // Build a custom SnpEff database from the reference + its annotation so contig names
+    // match the called VCF by construction (avoids the usual DB/contig mismatch).
     """
-    snpEff -dataDir \$PWD/snpeff_data ${params.snpeff_db} ${vcf} > ${sample}.annotated.vcf
+    mkdir -p data/genome
+    cp ${reference} data/genome/sequences.fa
+    case "${annotation}" in
+        *.gz) gunzip -c ${annotation} > data/genome/genes.gff ;;
+        *)    cp ${annotation} data/genome/genes.gff ;;
+    esac
+    printf 'data.dir = ./data/\\ngenome.genome : custom\\n' > snpEff.config
+    snpEff build -gff3 -noCheckCds -noCheckProtein -c snpEff.config -dataDir \$PWD/data genome
+    snpEff -c snpEff.config -dataDir \$PWD/data genome ${vcf} > ${sample}.annotated.vcf
     """
 }
